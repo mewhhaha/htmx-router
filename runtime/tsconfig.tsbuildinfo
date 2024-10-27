@@ -1,1 +1,7 @@
-{"root":["./src/client/jsx-runtime.ts","./src/server/jsx-runtime.ts"],"version":"5.6.3"}
+{
+  "root": [
+    "./src/client/jsx-runtime.ts",
+    "./src/server/jsx-runtime.ts"
+  ],
+  "version": "5.6.3"
+}
