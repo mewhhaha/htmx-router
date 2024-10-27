@@ -1,0 +1,27 @@
+{
+  "name": "runtime",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "exports": {
+    "./client/*": {
+      "import": "./src/client/*",
+      "types": "./src/client/*"
+    },
+    "./server/*": {
+      "import": "./src/server/*",
+      "types": "./src/server/*"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "oxlint": "^0.10.2",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.2"
+  }
+}
