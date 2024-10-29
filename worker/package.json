@@ -7,12 +7,14 @@
     "dev": "wrangler dev",
     "start": "wrangler dev",
     "test": "vitest",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "routes": "node --experimental-strip-types --no-warnings ./src/fs-routes/routes.mts ./app"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241018.0",
     "oxlint": "^0.10.2",
     "prettier": "^3.3.3",
+    "typed-htmx": "^0.3.1",
     "typescript": "^5.5.2",
     "wrangler": "^3.60.3"
   },

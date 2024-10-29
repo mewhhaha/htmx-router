@@ -51,6 +51,9 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
+      typed-htmx:
+        specifier: ^0.3.1
+        version: 0.3.1
       typescript:
         specifier: ^5.5.2
         version: 5.6.3
@@ -1152,6 +1155,14 @@ packages:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
 
+  typed-html@3.0.1:
+    resolution: {integrity: sha512-JKCM9zTfPDuPqQqdGZBWSEiItShliKkBFg5c6yOR8zth43v763XkAzTWaOlVqc0Y6p9ee8AaAbipGfUnCsYZUA==}
+    engines: {node: '>=12'}
+
+  typed-htmx@0.3.1:
+    resolution: {integrity: sha512-6WSPsukTIOEMsVbx5wzgVSvldLmgBUVcFIm2vJlBpRPtcbDOGC5y1IYrCWNX1yUlNsrv1Ngcw4gGM8jsPyNV7w==}
+    engines: {node: '>=12'}
+
   typescript@5.6.3:
     resolution: {integrity: sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==}
     engines: {node: '>=14.17'}
@@ -2219,6 +2230,12 @@ snapshots:
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
+
+  typed-html@3.0.1: {}
+
+  typed-htmx@0.3.1:
+    dependencies:
+      typed-html: 3.0.1
 
   typescript@5.6.3: {}
 
