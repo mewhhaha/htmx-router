@@ -14,6 +14,9 @@ export default function Route({ children }: { children?: string }) {
         <li>
           <Link to="/profiles/c">profile c</Link>
         </li>
+        <li>
+          <Link to="/home">home</Link>
+        </li>
       </ul>
       <section>{children}</section>
     </div>

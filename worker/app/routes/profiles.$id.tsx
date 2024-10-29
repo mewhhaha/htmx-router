@@ -1,7 +1,6 @@
 import { ctx } from "../../src/router/router";
 
 export const loader = ({ params }: ctx) => {
-  console.log(params);
   return { id: params.id };
 };
 

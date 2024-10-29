@@ -69,13 +69,14 @@ const routeItems = routes
   })
   .map(([file, name, path]) => {
     const fragments = [
-      `$${name}`,
+      "$root",
       ...routes
         .filter(([prefix]) => file.startsWith(`${prefix}.`))
         .map(([, name]) => {
           return `$${name}`;
-        }),
-      "$root",
+        })
+        .reverse(),
+      `$${name}`,
     ];
 
     return `["${path}", [${fragments.join(",")}]]`;

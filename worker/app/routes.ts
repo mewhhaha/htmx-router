@@ -19,9 +19,9 @@ const $$profiles = { id: "profiles", mod: $profiles };
 const $$_index = { id: "_index", mod: $_index };
 const $root = { id: "", mod: root };
 
-export const routes: route[] = [["/profiles/a", [$$profiles__a_a,$$profiles__a,$$profiles,$root]],
-["/profiles/b", [$$profiles__a_b,$$profiles__a,$$profiles,$root]],
-["/profiles", [$$profiles__index,$$profiles,$root]],
-["/profiles/:id", [$$profiles__id,$$profiles,$root]],
-["/home", [$$home,$root]],
-["/", [$$_index,$root]]];
+export const routes: route[] = [["/profiles/a", [$root,$$profiles,$$profiles__a,$$profiles__a_a]],
+["/profiles/b", [$root,$$profiles,$$profiles__a,$$profiles__a_b]],
+["/profiles", [$root,$$profiles,$$profiles__index]],
+["/profiles/:id", [$root,$$profiles,$$profiles__id]],
+["/home", [$root,$$home]],
+["/", [$root,$$_index]]];

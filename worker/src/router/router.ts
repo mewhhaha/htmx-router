@@ -18,7 +18,7 @@ export type mod = {
 
 export type fragment = { id: string; mod: mod; params?: string[] };
 
-export type route = [path: string, fragments: [leaf: fragment, ...fragment[]]];
+export type route = [path: string, fragments: fragment[]];
 
 export type router = {
   handle: (request: Request, ...args: unknown[]) => Promise<Response>;
@@ -37,11 +37,12 @@ export const Router = (routes: route[]): router => {
     const ctx = { request, params, context: args };
 
     try {
-      const leaf = fragments[0].mod;
+      const leafToRoot = fragments.toReversed();
+      const leaf = leafToRoot[0].mod;
 
       if (request.method === "GET") {
         if (leaf.default) {
-          return await routeResponse(target, fragments, ctx);
+          return await routeResponse(target, leafToRoot, ctx);
         }
 
         if (leaf.loader) {
@@ -83,34 +84,17 @@ const appendHeaders = (headers: Headers, appended: Headers) => {
   }
 };
 
-const diffFragments = (
+export const diff = (
   current: { params: Record<string, string>; fragments: fragment[] },
   next: { params: Record<string, string>; fragments: fragment[] },
 ) => {
-  for (let i = 0; i < current.fragments.length; i++) {
-    const currentIndex = current.fragments.length - 1 - i;
-    const nextIndex = next.fragments.length - 1 - i;
+  const index = findDiffIndex(current, next);
 
-    const currentFragment = current.fragments[currentIndex];
-    const nextFragment = next.fragments[nextIndex];
-
-    const mismatchingId = currentFragment.id !== nextFragment.id;
-    const mismatchingParamValue = nextFragment.params?.some(
-      (param) => current.params[param] !== next.params[param],
-    );
-
-    if (mismatchingId || mismatchingParamValue) {
-      const target = next.fragments[nextIndex + 1]?.id;
-      const fragments = next.fragments.slice(0, nextIndex + 1);
-      return {
-        target,
-        ...next,
-        fragments,
-      };
-    }
-  }
-
-  return { target: undefined, ...next };
+  return {
+    target: next.fragments.at(index - 1)?.id,
+    params: next.params,
+    fragments: next.fragments.slice(index),
+  };
 };
 
 const matchRoute = (routes: route[], request: Request) => {
@@ -129,7 +113,7 @@ const matchRoute = (routes: route[], request: Request) => {
     return { target: undefined, ...next };
   }
 
-  return diffFragments(current, next);
+  return diff(current, next);
 };
 
 const findRoute = (routes: route[], pathname: string) => {
@@ -167,18 +151,18 @@ const loaderResponse = async (loader: loader, ctx: ctx) => {
 
 const routeResponse = async (
   target: string | undefined,
-  fragments: fragment[],
+  leafToRoot: fragment[],
   ctx: ctx,
 ) => {
   const loaders = await Promise.all(
-    fragments.map((fragment) => fragment.mod.loader?.(ctx)),
+    leafToRoot.map((fragment) => fragment.mod.loader?.(ctx)),
   );
 
   const headers = new Headers();
 
   let html: string | undefined = undefined;
 
-  for (let i = 0; i < fragments.length; i++) {
+  for (let i = 0; i < leafToRoot.length; i++) {
     let loaderData = loaders[i];
     if (loaderData instanceof Response) {
       appendHeaders(headers, loaderData.headers);
@@ -188,7 +172,7 @@ const routeResponse = async (
     const {
       id,
       mod: { default: Component },
-    } = fragments[i];
+    } = leafToRoot[i];
     if (!Component) {
       continue;
     }
@@ -205,8 +189,37 @@ const routeResponse = async (
   if (target) {
     headers.set("hx-retarget", `[data-children="${target}"]`);
     headers.set("hx-swap", "outerHTML");
+    headers.set("hx-trigger", "true");
   }
   headers.set("content-type", "text/html");
 
   return new Response(html, { headers, status: 200 });
+};
+
+const findDiffIndex = (
+  current: { params: Record<string, string>; fragments: fragment[] },
+  next: { params: Record<string, string>; fragments: fragment[] },
+) => {
+  for (let index = 0; index < next.fragments.length; index++) {
+    const c = current.fragments[index];
+    const n = next.fragments[index];
+    if (!c) {
+      return index;
+    }
+
+    if (!n) {
+      return -1;
+    }
+
+    if (c.id !== n.id) {
+      return index;
+    }
+
+    if (
+      n.params?.some((param) => current.params[param] !== next.params[param])
+    ) {
+      return index;
+    }
+  }
+  return -1;
 };
