@@ -22,7 +22,21 @@ export default function Root({ children }: { children?: string }) {
           </script>
           <script src="https://cdn.tailwindcss.com"></script>
           <script src="https://unpkg.com/htmx.org@2.0.3"></script>
-          <script type="module">import "hydrate-me";</script>
+          <script type="module">
+            {`
+            `}
+          </script>
+          <script type="module" defer="true">
+            {`
+             import { define} from "hydrate-me";
+             import counter from "counter";
+            window.components = {
+              counter,
+            };
+            define();
+
+            `}
+          </script>
         </head>
         <body class="bg-black text-white">{children}</body>
       </html>

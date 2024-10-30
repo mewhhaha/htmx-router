@@ -3,13 +3,13 @@ class HydrateMe extends HTMLElement {
   constructor() {
     super();
   }
-  async connectedCallback() {
+  connectedCallback() {
     const src = this.getAttribute("src");
     if (src === null) {
       this.parentElement?.removeChild(this);
       return;
     }
-    const component = await import(src);
+    const Component = window.components[src];
     let node = this;
     const children = [...this.children];
     for (const child of this.children) {
@@ -20,7 +20,6 @@ class HydrateMe extends HTMLElement {
       for (const attribute of this.attributes) {
         props[attribute.name] = attribute.value;
       }
-      const Component = component.default;
       const html = Component(props);
       node.insertAdjacentElement("beforebegin", html);
       node.parentElement?.removeChild(node);
@@ -28,7 +27,11 @@ class HydrateMe extends HTMLElement {
     });
   }
 }
-window.customElements.define("hydrate-me", HydrateMe);
+
+export const define = () => {
+  window.customElements.define("hydrate-me", HydrateMe);
+};
+
 let needsEnqueue = true;
 const w = new Signal.subtle.Watcher(() => {
   if (needsEnqueue) {
