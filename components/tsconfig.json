@@ -3,6 +3,7 @@
     "target": "ESNext",
     "module": "NodeNext",
     "outDir": "dist",
+    "lib": ["ESNext", "DOM", "DOM.AsyncIterable"],
     "jsx": "react-jsx",
     "jsxImportSource": "runtime/client",
     "esModuleInterop": true,

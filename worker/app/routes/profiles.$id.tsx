@@ -10,5 +10,21 @@ export default function Route({
   children?: string;
   loaderData?: { id: string };
 }) {
-  return <div>Profil {id}</div>;
+  return (
+    <div>
+      Profil {id}
+      <hydrate-me hidden="true" src="counter">
+        <div>hello</div>
+        <div>world</div>
+      </hydrate-me>
+    </div>
+  );
+}
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "hydrate-me": { src: string; children?: string; hidden: "true" };
+    }
+  }
 }
