@@ -1,9 +1,9 @@
 {
   "imports": {
     "hydrate-me": "/08f0db379bf27df9-hydrate-me.mjs",
-    "runtime/client/jsx-runtime": "/ffb4e2f168ce86b2-runtime.client.jsx-runtime.mjs",
-    "runtime": "/afc828484fcb4b61-runtime.mjs",
+    "runtime/client/jsx-runtime": "/768e59bc2e2dfd3c-runtime.client.jsx-runtime.mjs",
+    "runtime": "/8730e249d7f91957-runtime.mjs",
     "signal-polyfill": "/312f0e4b17030723-signal-polyfill.mjs",
-    "register": "/caf75a905bad081d-register.mjs"
+    "register": "/c0ee543d9c20b8ab-register.mjs"
   }
 }

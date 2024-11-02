@@ -1,6 +1,8 @@
 import { Signal } from "signal-polyfill";
 import morphdom from "morphdom";
 
+export const s = Symbol();
+
 declare global {
   namespace JSX {
     export type AnyNode =
@@ -10,7 +12,7 @@ declare global {
       | null
       | false
       | undefined
-      | (() => AnyNode);
+      | Generator<JSX.Element, JSX.Element, any>;
     export type Element = AnyNode | AnyNode[];
 
     export interface IntrinsicElements {
@@ -18,6 +20,8 @@ declare global {
     }
   }
 }
+
+export const Fragment = ({ children }: { children: JSX.Element }) => children;
 
 export function jsx(
   tag: string | Function,
@@ -41,18 +45,52 @@ export function jsx(
       return [child];
     } else if (child === null || child === false || child === undefined) {
       return [];
-    } else if (typeof child === "function") {
+    } else if (
+      typeof child === "object" &&
+      typeof child[Symbol.iterator] == "function" &&
+      typeof child["next"] == "function" &&
+      typeof child["throw"] == "function"
+    ) {
       const s = child;
       const placeholder = document.createComment(`effect`);
-      let previous: HTMLElement | Text | Comment = f(s())[0];
+
+      let previous: (HTMLElement | Text | Comment)[] = f(s.next().value);
+      if (previous.length === 0) {
+        previous.push(placeholder);
+      }
+
       const unwatch = effect(() => {
-        const [next] = f(s()) ?? [placeholder];
-        // @ts-expect-error morphdom returns the new element but isn't typed that way
-        const morphed: HTMLElement | Text | Comment = morphdom(previous, next);
+        const next = f(s.next(previous).value);
+        if (next.length === 0) {
+          next.push(placeholder);
+        }
+
+        let morphed: (HTMLElement | Text | Comment)[] = [];
+
+        for (let i = 0; i < Math.max(previous.length, next.length); i++) {
+          const p = previous[i];
+          const n = next[i];
+          if (p && n) {
+            // @ts-expect-error morphdom returns the new element but isn't typed that way
+            const el: HTMLElement | Text | Comment = morphdom(
+              p,
+              n ?? placeholder,
+            );
+            morphed.push(el);
+          } else if (!n && p) {
+            p.remove();
+          } else if (!p && n) {
+            const lastElement = morphed[morphed.length - 1];
+            lastElement.after(n);
+            morphed.push(n);
+          }
+        }
+
         previous = morphed;
       });
       demount.push(unwatch);
-      return [previous];
+
+      return previous;
     } else {
       const textNode = document.createTextNode(child.toString());
       return [textNode];
