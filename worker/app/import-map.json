@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "hydrate-me": "/08f0db379bf27df9-hydrate-me.mjs",
+    "runtime/client/jsx-runtime": "/931cde565867005f-runtime.client.jsx-runtime.mjs",
+    "runtime": "/afc828484fcb4b61-runtime.mjs",
+    "signal-polyfill": "/312f0e4b17030723-signal-polyfill.mjs",
+    "register": "/3e7dabd88ad9eb71-register.mjs"
+  }
+}

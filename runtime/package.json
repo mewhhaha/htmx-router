@@ -5,30 +5,35 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -b && esbuild --bundle --platform=browser --format=esm --outfile=dist/signal-polyfill.js src/signal.ts"
+    "build": "run-p build:*",
+    "build:signal": "esbuild --bundle --platform=browser --format=esm --outfile=dist/signal-polyfill.mjs src/signal.ts",
+    "build:runtime": "esbuild --bundle --platform=browser --format=esm --outfile=dist/runtime.mjs src/runtime.ts --external:signal-polyfill",
+    "build:client": "esbuild --bundle --platform=browser --format=esm --outfile=dist/runtime.client.jsx-runtime.mjs src/client/jsx-runtime.ts --external:signal-polyfill",
+    "build:hydrate": "esbuild --bundle --platform=browser --format=esm --outfile=dist/hydrate-me.mjs src/hydrate-me.tsx --external:signal-polyfill"
   },
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts"
+      "import": "./src/runtime.ts",
+      "types": "./src/runtime.ts"
     },
     "./client/jsx-runtime": {
       "import": "./src/client/jsx-runtime.ts",
       "types": "./src/client/jsx-runtime.ts"
-    },
-    "./server/*": {
-      "import": "./src/server/*",
-      "types": "./src/server/*"
     }
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^22.8.6",
     "esbuild": "^0.24.0",
+    "npm-run-all": "^4.1.5",
     "oxlint": "^0.10.2",
     "prettier": "^3.3.3",
     "signal-polyfill": "^0.2.1",
     "typescript": "^5.5.2"
+  },
+  "dependencies": {
+    "morphdom": "^2.7.4"
   }
 }

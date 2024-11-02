@@ -4,9 +4,9 @@ type CounterProps = {
   children: JSX.AnyNode;
 };
 
-const count = useSignal(0);
-
 export default function Counter({ children }: CounterProps) {
+  const count = useSignal(0);
+
   return (
     <div>
       <button
@@ -18,7 +18,7 @@ export default function Counter({ children }: CounterProps) {
       </button>
       {children}
       {count.get() > 3 ? "greater than 3" : "less than 3"}
-      <div>{count}</div>
+      <div>{() => count.get()}</div>
       {count.get() > 3 ? <div>wha, wha</div> : <p>cool</p>}
     </div>
   );

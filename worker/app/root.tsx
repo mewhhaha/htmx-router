@@ -1,3 +1,5 @@
+import importMap from "./import-map.json";
+
 export default function Root({ children }: { children?: string }) {
   return (
     "<!doctype html>" +
@@ -9,32 +11,15 @@ export default function Root({ children }: { children?: string }) {
             name="viewport"
             content="width=device-width, initial-scale=1.0"
           ></meta>
-          <script type="importmap">
-            {JSON.stringify({
-              imports: {
-                "hydrate-me": "/hydrate-me.mjs",
-                "signal-polyfill": "/signal-polyfill.mjs",
-                counter: "/counter.mjs",
-                runtime: "/runtime.mjs",
-                "runtime/client/jsx-runtime": "/jsx-runtime.mjs",
-              },
-            })}
-          </script>
+          <script type="importmap">{JSON.stringify(importMap)}</script>
           <script src="https://cdn.tailwindcss.com"></script>
           <script src="https://unpkg.com/htmx.org@2.0.3"></script>
-          <script type="module">
-            {`
-            `}
-          </script>
           <script type="module" defer="true">
             {`
-             import { define} from "hydrate-me";
-             import counter from "counter";
-            window.components = {
-              counter,
-            };
+            import { register } from "register";
+            import { define } from "hydrate-me";
+            register();
             define();
-
             `}
           </script>
         </head>

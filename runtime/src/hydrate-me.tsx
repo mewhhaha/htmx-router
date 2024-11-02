@@ -1,5 +1,3 @@
-import { Signal } from "signal-polyfill";
-
 class HydrateMe extends HTMLElement {
   constructor() {
     super();
@@ -11,62 +9,27 @@ class HydrateMe extends HTMLElement {
       return;
     }
 
-    const component = await import(src);
-    effect(() => {
-      const children: any[] = [...this.children];
+    // @ts-expect-error we just hoping components is defined
+    const Component = window.components?.[src];
 
-      for (const child of this.children) {
-        this.removeChild(child);
-      }
+    const children: any[] = [...this.children];
 
-      const props: Record<string, unknown> = { children };
-      for (const attribute of this.attributes) {
-        props[attribute.name] = attribute.value;
-      }
+    for (const child of this.children) {
+      this.removeChild(child);
+    }
 
-      const Component = component.default;
-      const node = Component(props);
-      this.insertAdjacentElement("beforebegin", node);
-      this.parentElement?.removeChild(this);
-    });
+    const props: Record<string, unknown> = { children };
+    for (const attribute of this.attributes) {
+      props[attribute.name] = attribute.value;
+    }
+
+    const node = Component(props);
+
+    this.insertAdjacentElement("beforebegin", node);
+    this.parentElement?.removeChild(this);
   }
 }
 
-window.customElements.define("hydrate-me", HydrateMe);
-
-let needsEnqueue = true;
-
-const w = new Signal.subtle.Watcher(() => {
-  if (needsEnqueue) {
-    needsEnqueue = false;
-    queueMicrotask(processPending);
-  }
-});
-
-function processPending() {
-  needsEnqueue = true;
-
-  for (const s of w.getPending()) {
-    s.get();
-  }
-
-  w.watch();
-}
-
-export function effect(callback: () => (() => void) | void) {
-  let cleanup: (() => void) | void;
-
-  const computed = new Signal.Computed(() => {
-    typeof cleanup === "function" && cleanup();
-    cleanup = callback();
-  });
-
-  w.watch(computed);
-  computed.get();
-
-  return () => {
-    w.unwatch(computed);
-    typeof cleanup === "function" && cleanup();
-    cleanup = undefined;
-  };
-}
+export const define = () => {
+  window.customElements.define("hydrate-me", HydrateMe);
+};

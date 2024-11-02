@@ -1,4 +1,5 @@
 import { Signal } from "signal-polyfill";
+import morphdom from "morphdom";
 
 declare global {
   namespace JSX {
@@ -9,7 +10,7 @@ declare global {
       | null
       | false
       | undefined
-      | typeof Signal;
+      | (() => AnyNode);
     export type Element = AnyNode | AnyNode[];
 
     export interface IntrinsicElements {
@@ -26,32 +27,44 @@ export function jsx(
     return tag({ children, ...props });
   }
 
+  const demount: (() => void)[] = [];
+
   const element = document.createElement(tag);
-  const f = (child: JSX.Element) => {
-    console.log(child);
+  const f = (child: JSX.Element): (HTMLElement | Text | Comment)[] => {
     if (Array.isArray(child)) {
-      child.forEach(f);
-    } else if (child instanceof HTMLElement) {
-      element.appendChild(child);
+      return child.flatMap(f);
     } else if (
-      typeof child === "object" &&
-      child !== null &&
-      "get" in child &&
-      typeof child.get === "function"
+      child instanceof HTMLElement ||
+      child instanceof Text ||
+      child instanceof Comment
     ) {
-      f(child.get());
+      return [child];
     } else if (child === null || child === false || child === undefined) {
-      // Do nothing
+      return [];
+    } else if (typeof child === "function") {
+      const s = child;
+      const placeholder = document.createComment(`effect`);
+      let previous: HTMLElement | Text | Comment = f(s())[0];
+      const unwatch = effect(() => {
+        const [next] = f(s()) ?? [placeholder];
+        // @ts-expect-error morphdom returns the new element but isn't typed that way
+        const morphed: HTMLElement | Text | Comment = morphdom(previous, next);
+        previous.replaceWith(morphed);
+        previous = morphed;
+      });
+      demount.push(unwatch);
+      return [previous];
     } else {
       const textNode = document.createTextNode(child.toString());
-      element.appendChild(textNode);
+      return [textNode];
     }
   };
 
-  if (Array.isArray(children)) {
-    children.forEach(f);
-  } else {
-    f(children);
+  if (children) {
+    const elements = f(children);
+    for (const el of elements) {
+      element.appendChild(el);
+    }
   }
 
   for (const prop in props) {
@@ -62,9 +75,60 @@ export function jsx(
     }
   }
 
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.removedNodes) {
+        if (node === element) {
+          observer.disconnect();
+          for (const unwatch of demount) {
+            unwatch();
+          }
+          break;
+        }
+      }
+    }
+  });
+  observer.observe(element, { characterData: true });
   return element;
 }
 
 export function jsxs(tag: any, props: any): Element {
   return jsx(tag, props);
+}
+
+let needsEnqueue = true;
+
+const w = new Signal.subtle.Watcher(() => {
+  if (needsEnqueue) {
+    needsEnqueue = false;
+    queueMicrotask(processPending);
+  }
+});
+
+function processPending() {
+  needsEnqueue = true;
+
+  for (const s of w.getPending()) {
+    s.get();
+  }
+
+  w.watch();
+}
+
+function effect(callback: () => (() => void) | void) {
+  let cleanup: (() => void) | void;
+
+  const computed = new Signal.Computed(() => {
+    typeof cleanup === "function" && cleanup();
+    cleanup = callback();
+  });
+
+  w.watch(computed);
+  computed.get();
+
+  return () => {
+    w.unwatch(computed);
+    typeof cleanup === "function" && cleanup();
+    cleanup = undefined;
+  };
 }
