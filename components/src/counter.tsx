@@ -6,14 +6,16 @@ type CounterProps = {
 
 export default function Counter({ children }: CounterProps) {
   const count = useSignal(0);
-  const next = useSignal(0);
+  const todo = useSignal<[number, null | unknown, "request" | "load" | "done"]>(
+    [1, null, "request"],
+  );
 
   return (
     <div>
       <button
         onClick={() => {
           count.set(count.get() + 1);
-          next.set(next.get() + 1);
+          todo.set([todo.get()[0] + 1, todo.get()[1], "request"]);
         }}
       >
         increment
@@ -33,22 +35,29 @@ export default function Counter({ children }: CounterProps) {
           </>
         );
       })}
-      {test(next)}
+      {test(todo)}
     </div>
   );
 }
 
-function* test(t: SignalState<number>): Effect<JSX.Element> {
+function* test(
+  todo: SignalState<[number, null | unknown, "request" | "load" | "done"]>,
+): Effect<JSX.Element> {
   while (true) {
-    t.get();
-    yield <div>{t.get()}</div>;
-    t.get();
-    yield (
-      <div>
-        <div>hello there</div>
-      </div>
-    );
-    t.get();
-    yield <div>3</div>;
+    const [number, value, status] = todo.get();
+    if (status === "request") {
+      fetch(`https://jsonplaceholder.typicode.com/todos/${todo.get()[0]}`).then(
+        async (response) => {
+          const json = await response.json();
+          if (todo.get()[0] !== number) {
+            return;
+          }
+          todo.set([number, json, "done"]);
+        },
+      );
+      todo.set([number, value, "load"]);
+    }
+
+    yield <div>{JSON.stringify(value)}</div>;
   }
 }

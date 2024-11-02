@@ -12,7 +12,8 @@ declare global {
       | null
       | false
       | undefined
-      | Generator<JSX.Element, JSX.Element, any>;
+      | Generator<JSX.Element, JSX.Element, any>
+      | AsyncGenerator<JSX.Element, JSX.Element, any>;
     export type Element = AnyNode | AnyNode[];
 
     export interface IntrinsicElements {
@@ -37,20 +38,21 @@ export function jsx(
   const f = (child: JSX.Element): (HTMLElement | Text | Comment)[] => {
     if (Array.isArray(child)) {
       return child.flatMap(f);
-    } else if (
+    }
+
+    if (
       child instanceof HTMLElement ||
       child instanceof Text ||
       child instanceof Comment
     ) {
       return [child];
-    } else if (child === null || child === false || child === undefined) {
+    }
+
+    if (child === null || child === false || child === undefined) {
       return [];
-    } else if (
-      typeof child === "object" &&
-      typeof child[Symbol.iterator] == "function" &&
-      typeof child["next"] == "function" &&
-      typeof child["throw"] == "function"
-    ) {
+    }
+
+    if (isGenerator(child)) {
       const s = child;
       const placeholder = document.createComment(`effect`);
 
@@ -91,10 +93,10 @@ export function jsx(
       demount.push(unwatch);
 
       return previous;
-    } else {
-      const textNode = document.createTextNode(child.toString());
-      return [textNode];
     }
+
+    const textNode = document.createTextNode(child.toString());
+    return [textNode];
   };
 
   if (children) {
@@ -169,3 +171,13 @@ function effect(callback: () => (() => void) | void) {
     cleanup = undefined;
   };
 }
+
+const isGenerator = (
+  value: JSX.AnyNode,
+): value is Generator<JSX.Element, JSX.Element, any> => {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof value[Symbol.iterator as keyof typeof value] === "function"
+  );
+};
