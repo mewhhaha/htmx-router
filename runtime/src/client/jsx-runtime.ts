@@ -49,7 +49,6 @@ export function jsx(
         const [next] = f(s()) ?? [placeholder];
         // @ts-expect-error morphdom returns the new element but isn't typed that way
         const morphed: HTMLElement | Text | Comment = morphdom(previous, next);
-        previous.replaceWith(morphed);
         previous = morphed;
       });
       demount.push(unwatch);
