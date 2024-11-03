@@ -834,10 +834,14 @@ declare global {
 
     // typed-html
     interface HtmlTag extends HtmxAttributes {}
-
-    type Element = unknown[];
   }
 
   /** @ignore */
   interface HTMLElement extends HtmxAttributes {}
+}
+
+declare module "typed-html" {
+  namespace JSX {
+    type Element = unknown[];
+  }
 }
