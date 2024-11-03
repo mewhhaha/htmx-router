@@ -1,4 +1,4 @@
-import { useSignal, $, Effect, SignalState } from "runtime";
+import { useSignal, $, Effect } from "runtime";
 
 type CounterProps = {
   children: JSX.AnyNode;
@@ -6,21 +6,17 @@ type CounterProps = {
 
 export default function Counter({ children }: CounterProps) {
   const count = useSignal(0);
-  const todo = useSignal<[number, null | unknown, "request" | "load" | "done"]>(
-    [1, null, "request"],
-  );
 
   return (
     <div>
       <button
         onClick={() => {
           count.set(count.get() + 1);
-          todo.set([todo.get()[0] + 1, todo.get()[1], "request"]);
         }}
       >
         increment
       </button>
-      {children}
+      {$(() => (count.get() > 3 ? children : null))}
       {$(() => (count.get() > 3 ? "greater than 3" : "less than 3"))}
       <div>{$(() => count.get())}</div>
       {$(() => (count.get() > 3 ? <div>wha, wha</div> : <p>cool</p>))}
@@ -35,14 +31,15 @@ export default function Counter({ children }: CounterProps) {
           </>
         );
       })}
-      {test(todo)}
+      <Test />
     </div>
   );
 }
 
-function* test(
-  todo: SignalState<[number, null | unknown, "request" | "load" | "done"]>,
-): Effect<JSX.Element> {
+function* Test(): Effect<JSX.Element> {
+  const todo = useSignal<[number, null | unknown, "request" | "load" | "done"]>(
+    [1, null, "request"],
+  );
   while (true) {
     const [number, value, status] = todo.get();
     if (status === "request") {

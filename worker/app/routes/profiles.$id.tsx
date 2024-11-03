@@ -1,6 +1,9 @@
 import { ctx } from "../../src/router/router";
 
-export const loader = ({ params }: ctx) => {
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const loader = async ({ params }: ctx) => {
+  await sleep(2000);
   return { id: params.id };
 };
 

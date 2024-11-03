@@ -3,6 +3,12 @@ import { Router } from "./router/router";
 
 type Env = {};
 
+declare global {
+  interface ctx {
+    context: [Env, ExecutionContext];
+  }
+}
+
 const router = Router(routes);
 
 const handler: ExportedHandler<Env> = {

@@ -7,6 +7,8 @@ import {
 } from "node:fs/promises";
 import { createHash } from "node:crypto";
 
+const folders = ["../components/dist"];
+
 const generateFingerprints = async (folder: string) => {
   const files = await readdir(folder);
   const fingerprints: Record<string, string> = {};
@@ -50,8 +52,6 @@ const readImportMap = (fingerprints: Record<string, string>) => {
 };
 
 await removeFolder("./public");
-
-const folders = ["../runtime/dist", "../components/dist"];
 
 const fingerprints = await Promise.all(folders.map(generateFingerprints)).then(
   (f) => Object.assign({}, ...f),

@@ -4,21 +4,17 @@
   "type": "module",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "build": "run-p build:*",
-    "build:signal": "esbuild --bundle --platform=browser --format=esm --outfile=dist/signal-polyfill.mjs src/signal.ts",
-    "build:runtime": "esbuild --bundle --platform=browser --format=esm --outfile=dist/runtime.mjs src/runtime.ts --external:signal-polyfill",
-    "build:client": "esbuild --bundle --platform=browser --format=esm --outfile=dist/runtime.client.jsx-runtime.mjs src/client/jsx-runtime.ts --external:signal-polyfill",
-    "build:hydrate": "esbuild --bundle --platform=browser --format=esm --outfile=dist/hydrate-me.mjs src/hydrate-me.tsx --external:signal-polyfill"
-  },
+  "scripts": {},
   "exports": {
     ".": {
       "import": "./src/runtime.ts",
       "types": "./src/runtime.ts"
     },
     "./client/jsx-runtime": {
-      "import": "./src/client/jsx-runtime.ts",
-      "types": "./src/client/jsx-runtime.ts"
+      "import": "./src/client/jsx-runtime.ts"
+    },
+    "./server/jsx-runtime": {
+      "import": "./src/server/jsx-runtime.ts"
     }
   },
   "keywords": [],
@@ -30,6 +26,7 @@
     "npm-run-all": "^4.1.5",
     "oxlint": "^0.10.2",
     "prettier": "^3.3.3",
+    "typed-html": "^3.0.1",
     "typescript": "^5.5.2"
   },
   "dependencies": {

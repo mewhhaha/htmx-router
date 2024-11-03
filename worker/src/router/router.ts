@@ -1,19 +1,26 @@
 import { match } from "./match";
 
-export type ctx = {
+export interface ctx {
   request: Request;
   params: Record<string, string>;
-  context: unknown;
-};
+  context: [unknown, ExecutionContext];
+}
 
-export type loader = (params: ctx) => Promise<unknown> | unknown;
-export type action = (params: ctx) => Promise<unknown> | unknown;
+export type loader = (params: ctx) => Promise<unknown>;
+export type action = (params: ctx) => Promise<unknown>;
 export type renderer = (props: {}) => JSX.Element;
+export type headers = (
+  params: ctx & {
+    readonly loaderData: Promise<unknown> | undefined;
+    headers: Headers;
+  },
+) => Headers | Promise<Headers>;
 
 export type mod = {
   loader?: loader;
   action?: action;
   default?: renderer;
+  headers?: headers;
 };
 
 export type fragment = { id: string; mod: mod; params?: string[] };
@@ -21,13 +28,13 @@ export type fragment = { id: string; mod: mod; params?: string[] };
 export type route = [path: string, fragments: fragment[]];
 
 export type router = {
-  handle: (request: Request, ...args: unknown[]) => Promise<Response>;
+  handle: (request: Request, ...args: ctx["context"]) => Promise<Response>;
 };
 
 export const Router = (routes: route[]): router => {
   const handle = async (
     request: Request,
-    ...args: unknown[]
+    ...args: ctx["context"]
   ): Promise<Response> => {
     const { target, fragments, params } = matchRoute(routes, request);
     if (!fragments) {
@@ -37,12 +44,11 @@ export const Router = (routes: route[]): router => {
     const ctx = { request, params, context: args };
 
     try {
-      const leafToRoot = fragments.toReversed();
-      const leaf = leafToRoot[0].mod;
+      const leaf = fragments[fragments.length - 1].mod;
 
       if (request.method === "GET") {
         if (leaf.default) {
-          return await routeResponse(target, leafToRoot, ctx);
+          return await routeResponse(target, fragments, ctx);
         }
 
         if (leaf.loader) {
@@ -71,17 +77,6 @@ export const Router = (routes: route[]): router => {
   return {
     handle,
   };
-};
-
-const disallowedHeaders = new Set(["content-type"]);
-const appendHeaders = (headers: Headers, appended: Headers) => {
-  for (const [key, value] of appended.entries()) {
-    if (disallowedHeaders.has(key.toLowerCase())) {
-      continue;
-    }
-
-    headers.append(key, value);
-  }
 };
 
 export const diff = (
@@ -151,49 +146,95 @@ const loaderResponse = async (loader: loader, ctx: ctx) => {
 
 const routeResponse = async (
   target: string | undefined,
-  leafToRoot: fragment[],
+  fragments: fragment[],
   ctx: ctx,
 ) => {
-  const loaders = await Promise.all(
-    leafToRoot.map((fragment) => fragment.mod.loader?.(ctx)),
-  );
+  const loaders = fragments.map((fragment) => fragment.mod.loader?.(ctx));
 
-  const headers = new Headers();
+  const initHeaders = new Headers();
+  initHeaders.set("content-type", "text/html");
+  if (target) {
+    initHeaders.set("hx-retarget", `[data-children="${target}"]`);
+    initHeaders.set("hx-swap", "outerHTML");
+    initHeaders.set("hx-trigger", "true");
+  } else {
+    initHeaders.set("transfer-encoding", "chunked");
+    initHeaders.set("connection", "keep-alive");
+  }
 
-  let html: string | undefined = undefined;
+  const headers = await loadAllHeaders(initHeaders, ctx, fragments, loaders);
 
-  for (let i = 0; i < leafToRoot.length; i++) {
-    let loaderData = loaders[i];
-    if (loaderData instanceof Response) {
-      appendHeaders(headers, loaderData.headers);
-      loaderData = await loaderData.json();
+  const text = new TextEncoder();
+
+  const stream = new TransformStream();
+  const writer = stream.writable.getWriter();
+
+  const write = async () => {
+    if (!target) {
+      writer.write(text.encode("<!doctype html>"));
     }
+    const render = async (i: number) => {
+      const fragment = fragments[i];
+      if (!fragment) {
+        return [""];
+      }
 
-    const {
-      id,
-      mod: { default: Component },
-    } = leafToRoot[i];
-    if (!Component) {
-      continue;
-    }
+      const {
+        mod: { default: Component },
+      } = fragment;
 
-    const props = {
-      loaderData,
-      children: html?.replace(/(\s*<[a-zA-Z-]+)/, `$1 data-children="${id}"`),
+      const parent = fragments[i - 1]?.id;
+      const loaderData = await loaders[i];
+      if (!Component) {
+        return render(i + 1);
+      }
+
+      const props = {
+        loaderData,
+        children: i === fragments.length - 1 ? "" : render(i + 1),
+      };
+
+      let [tag, ...rest] = Component(props);
+      if (!tag) {
+        return [""];
+      }
+
+      if (parent) {
+        tag = tag.replace(/^(<[a-z]+)/, `$1 data-children="${parent}"`);
+      }
+
+      return [tag, ...rest];
     };
 
-    html = Component(props);
-    html = html.toString(); // typed-html actually returns a Node
-  }
+    const chunks = await render(0);
+    const writeChunks = async (chunks: unknown[]) => {
+      for (let chunk of chunks) {
+        if (typeof chunk === "object" && chunk && "then" in chunk) {
+          // Flush the writer to ensure the chunk is written
+          await writer.write(text.encode("".padEnd(2048, "\n")));
+        }
+        const v = await chunk;
+        if (v === undefined || v === null || v === false) {
+          continue;
+        }
+        if (Array.isArray(v)) {
+          await writeChunks(v);
+        } else if (typeof v === "string") {
+          await writer.write(text.encode(v));
+        } else {
+          await writer.write(text.encode(v.toString()));
+        }
+      }
+    };
 
-  if (target) {
-    headers.set("hx-retarget", `[data-children="${target}"]`);
-    headers.set("hx-swap", "outerHTML");
-    headers.set("hx-trigger", "true");
-  }
-  headers.set("content-type", "text/html");
+    await writeChunks(chunks);
+    writer.close();
+  };
 
-  return new Response(html, { headers, status: 200 });
+  ctx.context[1].waitUntil(write());
+
+  console.log(...headers.entries());
+  return new Response(stream.readable, { headers, status: 200 });
 };
 
 const findDiffIndex = (
@@ -222,4 +263,32 @@ const findDiffIndex = (
     }
   }
   return -1;
+};
+
+const loadAllHeaders = async (
+  init: Headers,
+  ctx: ctx,
+  fragments: fragment[],
+  loaders: (Promise<unknown> | undefined)[],
+) => {
+  let headerTask = Promise.resolve(init);
+  for (let i = 0; i < fragments.length; i++) {
+    const fragment = fragments[i];
+    const loaderData = loaders[i];
+    const chain = async (headers: Headers) => {
+      const copy = new Headers(headers);
+      const extraHeaders = await fragment.mod.headers?.({
+        ...ctx,
+        loaderData,
+        headers: copy,
+      });
+      if (!extraHeaders) {
+        return copy;
+      }
+
+      return copy;
+    };
+    headerTask = headerTask.then(chain);
+  }
+  return headerTask;
 };

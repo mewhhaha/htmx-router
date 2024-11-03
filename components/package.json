@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild --bundle --platform=browser --format=esm --outfile=./dist/register.mjs src/register.ts --external:runtime --external:runtime/client/jsx-runtime"
+    "build": "esbuild --bundle --platform=browser --format=esm --outfile=./dist/register.mjs src/register.ts"
   },
   "keywords": [],
   "author": "",

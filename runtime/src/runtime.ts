@@ -1,4 +1,5 @@
 import { Signal } from "signal-polyfill";
+export { define } from "./hydrate-me.js";
 
 export const useSignal = <t>(value: t) => {
   const signal = new Signal.State(value);

@@ -5,7 +5,7 @@
     /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     "target": "ESNext",
     /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "DOM.AsyncIterable"],
     /* Specify what JSX code is generated. */
     "jsx": "react-jsx",
 
@@ -15,9 +15,9 @@
     /* Specify how TypeScript looks up a file from a given module specifier. */
     "moduleResolution": "Bundler",
 
-    "jsxImportSource": "typed-htmx/typed-html",
+    "jsxImportSource": "runtime/server",
     /* Specify type package names to be included without being referenced in a source file. */
-    "types": ["@cloudflare/workers-types/2023-07-01"],
+    "types": ["@cloudflare/workers-types/2023-07-01", "runtime/server"],
     /* Enable importing .json files */
     "resolveJsonModule": true,
 

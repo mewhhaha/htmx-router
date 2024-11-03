@@ -54,6 +54,9 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
+      typed-html:
+        specifier: ^3.0.1
+        version: 3.0.1
       typescript:
         specifier: ^5.5.2
         version: 5.6.3
@@ -82,9 +85,6 @@ importers:
       runtime:
         specifier: workspace:*
         version: link:../runtime
-      typed-htmx:
-        specifier: ^0.3.1
-        version: 0.3.1
       typescript:
         specifier: ^5.5.2
         version: 5.6.3
@@ -1429,10 +1429,6 @@ packages:
 
   typed-html@3.0.1:
     resolution: {integrity: sha512-JKCM9zTfPDuPqQqdGZBWSEiItShliKkBFg5c6yOR8zth43v763XkAzTWaOlVqc0Y6p9ee8AaAbipGfUnCsYZUA==}
-    engines: {node: '>=12'}
-
-  typed-htmx@0.3.1:
-    resolution: {integrity: sha512-6WSPsukTIOEMsVbx5wzgVSvldLmgBUVcFIm2vJlBpRPtcbDOGC5y1IYrCWNX1yUlNsrv1Ngcw4gGM8jsPyNV7w==}
     engines: {node: '>=12'}
 
   typescript@5.6.3:
@@ -2813,10 +2809,6 @@ snapshots:
       possible-typed-array-names: 1.0.0
 
   typed-html@3.0.1: {}
-
-  typed-htmx@0.3.1:
-    dependencies:
-      typed-html: 3.0.1
 
   typescript@5.6.3: {}
 

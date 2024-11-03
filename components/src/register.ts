@@ -1,6 +1,7 @@
 import counter from "./counter.js";
+import { define } from "runtime";
 
-export const register = () => {
-  (window as any).components ??= {};
-  (window as any).components["counter"] = counter;
-};
+(window as any).components ??= {};
+(window as any).components["counter"] = counter;
+
+define();
