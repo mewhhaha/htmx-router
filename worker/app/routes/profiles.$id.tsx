@@ -1,18 +1,13 @@
-import { ctx } from "../../src/router/router";
+import * as t from "./+types.profiles.$id";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const loader = async ({ params }: ctx) => {
+export const loader = async ({ params }: t.LoaderArgs) => {
   await sleep(2000);
   return { id: params.id };
 };
 
-export default function Route({
-  loaderData: { id } = { id: "" },
-}: {
-  children?: string;
-  loaderData?: { id: string };
-}) {
+export default function Route({ loaderData: { id } }: t.ComponentProps) {
   return (
     <div>
       Profil {id}

@@ -12,12 +12,13 @@
     "allowImportingTsExtensions": true,
     /* Specify what module code is generated. */
     "module": "es2022",
+    "esModuleInterop": true,
     /* Specify how TypeScript looks up a file from a given module specifier. */
     "moduleResolution": "Bundler",
 
-    "jsxImportSource": "runtime/server",
+    "jsxImportSource": "htmx-router-runtime/server",
     /* Specify type package names to be included without being referenced in a source file. */
-    "types": ["@cloudflare/workers-types/2023-07-01", "runtime/server"],
+    "types": ["@cloudflare/workers-types/2023-07-01"],
     /* Enable importing .json files */
     "resolveJsonModule": true,
 
@@ -40,8 +41,9 @@
     "strict": true,
 
     /* Skip type checking all .d.ts files. */
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "rootDirs": ["./.router/types", "."]
   },
   "exclude": ["test"],
-  "include": ["app", "src"]
+  "include": ["app", "src", ".router/types/**/*"]
 }

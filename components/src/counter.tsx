@@ -1,4 +1,4 @@
-import { useSignal, $, Effect } from "runtime";
+import { useSignal, $, Effect } from "htmx-router-runtime";
 
 type CounterProps = {
   children: JSX.AnyNode;
@@ -31,12 +31,12 @@ export default function Counter({ children }: CounterProps) {
           </>
         );
       })}
-      <Test />
+      {test()}
     </div>
   );
 }
 
-function* Test(): Effect<JSX.Element> {
+function* test(): Effect<JSX.Element> {
   const todo = useSignal<[number, null | unknown, "request" | "load" | "done"]>(
     [1, null, "request"],
   );

@@ -1,4 +1,4 @@
-import { match } from "./match";
+import { match } from "./match.mjs";
 
 export interface ctx {
   request: Request;

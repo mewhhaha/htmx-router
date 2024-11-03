@@ -834,6 +834,8 @@ declare global {
 
     // typed-html
     interface HtmlTag extends HtmxAttributes {}
+
+    type Element = unknown[];
   }
 
   /** @ignore */

@@ -1,4 +1,5 @@
 packages:
   - worker
   - components
-  - runtime
+  - htmx-router-runtime
+  - htmx-router

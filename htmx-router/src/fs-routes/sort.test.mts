@@ -1,5 +1,5 @@
 import { expect, describe, it } from "vitest";
-import { bySpecificity } from "./sort.mts";
+import { bySpecificity } from "./sort.mjs";
 
 describe("sorting", () => {
   it("should sort by specificity", () => {

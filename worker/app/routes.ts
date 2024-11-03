@@ -1,6 +1,6 @@
 
 import * as root from "./root.tsx";
-import { route } from "../src/router/router.ts";
+import { route } from "htmx-router";
 import * as $home from "./routes/home.tsx";
 import * as $profiles__id from "./routes/profiles.$id.tsx";
 import * as $profiles from "./routes/profiles.tsx";

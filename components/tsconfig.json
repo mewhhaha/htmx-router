@@ -7,7 +7,7 @@
     "outDir": "dist",
     "lib": ["ESNext", "DOM", "DOM.AsyncIterable", "DOM.Iterable"],
     "jsx": "react-jsx",
-    "jsxImportSource": "runtime/client",
+    "jsxImportSource": "htmx-router-runtime/client",
     "declaration": true,
     "emitDeclarationOnly": false,
     "esModuleInterop": true,

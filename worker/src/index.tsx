@@ -1,5 +1,5 @@
 import { routes } from "../app/routes";
-import { Router } from "./router/router";
+import { Router } from "router";
 
 type Env = {};
 

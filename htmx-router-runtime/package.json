@@ -1,5 +1,5 @@
 {
-  "name": "runtime",
+  "name": "htmx-router-runtime",
   "version": "1.0.0",
   "type": "module",
   "description": "",
