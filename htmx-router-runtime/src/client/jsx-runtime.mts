@@ -108,7 +108,7 @@ const runGeneratorEffect = (
 
     let morphed: (HTMLElement | Text | Comment)[] = [];
 
-    if (unwatch && !previous.every((el) => document.contains(el))) {
+    if (unwatch && !previous.every((el) => el.isConnected)) {
       unwatch();
       return;
     }
