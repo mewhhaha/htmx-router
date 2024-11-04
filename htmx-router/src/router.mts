@@ -6,8 +6,8 @@ export interface ctx {
   context: [unknown, ExecutionContext];
 }
 
-export type loader = (params: any) => Promise<unknown> | unknown;
-export type action = (params: any) => Promise<unknown> | unknown;
+export type loader = (params: any) => Promise<unknown>;
+export type action = (params: any) => Promise<unknown>;
 export type renderer = (props: any) => JSX.Element;
 export type headers = (
   params: ctx & {
