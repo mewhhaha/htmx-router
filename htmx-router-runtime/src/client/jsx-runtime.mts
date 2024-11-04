@@ -26,8 +26,6 @@ export function jsx(
   tag: string | Function,
   { children, ...props }: { children?: JSX.AnyNode } & Record<string, any>,
 ): (HTMLElement | Text | Comment) | (HTMLElement | Text | Comment)[] {
-  const demount: (() => void)[] = [];
-
   const f = (child: JSX.Element): (HTMLElement | Text | Comment)[] => {
     if (Array.isArray(child)) {
       return child.flatMap(f);
@@ -79,20 +77,6 @@ export function jsx(
     }
   }
 
-  const observer = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      for (const node of mutation.removedNodes) {
-        if (node === element) {
-          observer.disconnect();
-          for (const unwatch of demount) {
-            unwatch();
-          }
-          break;
-        }
-      }
-    }
-  });
-  observer.observe(element, { characterData: true });
   return element;
 }
 
