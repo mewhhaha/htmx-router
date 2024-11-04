@@ -1,9 +1,6 @@
 import * as t from "./+types.profiles.$id";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export const loader = async ({ params }: t.LoaderArgs) => {
-  await sleep(2000);
   return { id: params.id };
 };
 

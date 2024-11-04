@@ -1,6 +1,7 @@
 import "../common/typed.mjs";
 import { Signal } from "signal-polyfill";
 import morphdom from "morphdom";
+import { $ } from "../runtime.mjs";
 
 declare global {
   namespace JSX {
@@ -24,14 +25,9 @@ export const Fragment = ({ children }: { children: JSX.Element }) => children;
 export function jsx(
   tag: string | Function,
   { children, ...props }: { children?: JSX.AnyNode } & Record<string, any>,
-): Element {
-  if (typeof tag === "function") {
-    return tag({ children, ...props });
-  }
-
+): (HTMLElement | Text | Comment) | (HTMLElement | Text | Comment)[] {
   const demount: (() => void)[] = [];
 
-  const element = document.createElement(tag);
   const f = (child: JSX.Element): (HTMLElement | Text | Comment)[] => {
     if (Array.isArray(child)) {
       return child.flatMap(f);
@@ -49,52 +45,24 @@ export function jsx(
       return [];
     }
 
+    if (typeof child === "function") {
+      child = $(child);
+    }
+
     if (isGenerator(child)) {
-      const s = child;
-      const placeholder = document.createComment(`effect`);
-
-      let previous: (HTMLElement | Text | Comment)[] = f(s.next().value);
-      if (previous.length === 0) {
-        previous.push(placeholder);
-      }
-
-      const unwatch = effect(() => {
-        const next = f(s.next(previous).value);
-        if (next.length === 0) {
-          next.push(placeholder);
-        }
-
-        let morphed: (HTMLElement | Text | Comment)[] = [];
-
-        for (let i = 0; i < Math.max(previous.length, next.length); i++) {
-          const p = previous[i];
-          const n = next[i];
-          if (p && n) {
-            // @ts-expect-error morphdom returns the new element but isn't typed that way
-            const el: HTMLElement | Text | Comment = morphdom(
-              p,
-              n ?? placeholder,
-            );
-            morphed.push(el);
-          } else if (!n && p) {
-            p.remove();
-          } else if (!p && n) {
-            const lastElement = morphed[morphed.length - 1];
-            lastElement.after(n);
-            morphed.push(n);
-          }
-        }
-
-        previous = morphed;
-      });
-      demount.push(unwatch);
-
+      const previous = runGeneratorEffect(child, f);
       return previous;
     }
 
     const textNode = document.createTextNode(child.toString());
     return [textNode];
   };
+
+  if (typeof tag === "function") {
+    return tag({ children, ...props });
+  }
+
+  const element = document.createElement(tag);
 
   if (children) {
     const elements = f(children);
@@ -128,9 +96,60 @@ export function jsx(
   return element;
 }
 
-export function jsxs(tag: any, props: any): Element {
+export function jsxs(
+  tag: any,
+  props: any,
+): (HTMLElement | Text | Comment) | (HTMLElement | Text | Comment)[] {
   return jsx(tag, props);
 }
+
+const runGeneratorEffect = (
+  s: Generator<JSX.Element, JSX.Element, any>,
+  html: (value: JSX.Element) => (HTMLElement | Text | Comment)[],
+) => {
+  const placeholder = document.createComment(`effect`);
+
+  let previous: (HTMLElement | Text | Comment)[] = html(s.next().value);
+  if (previous.length === 0) {
+    previous.push(placeholder);
+  }
+
+  let unwatch: (() => void) | undefined;
+
+  unwatch = effect(() => {
+    const next = html(s.next(previous).value);
+    if (next.length === 0) {
+      next.push(placeholder);
+    }
+
+    let morphed: (HTMLElement | Text | Comment)[] = [];
+
+    if (unwatch && !previous.every((el) => document.contains(el))) {
+      unwatch();
+      return;
+    }
+
+    for (let i = 0; i < Math.max(previous.length, next.length); i++) {
+      const p = previous[i];
+      const n = next[i];
+      if (p && n) {
+        // @ts-expect-error morphdom returns the new element but isn't typed that way
+        const el: HTMLElement | Text | Comment = morphdom(p, n ?? placeholder);
+        morphed.push(el);
+      } else if (!n && p) {
+        p.remove();
+      } else if (!p && n) {
+        const lastElement = morphed[morphed.length - 1];
+        lastElement.after(n);
+        morphed.push(n);
+      }
+    }
+
+    previous = morphed;
+  });
+
+  return previous;
+};
 
 let needsEnqueue = true;
 

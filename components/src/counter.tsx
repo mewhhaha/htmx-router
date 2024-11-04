@@ -18,7 +18,7 @@ export default function Counter({ children }: CounterProps) {
       </button>
       {() => (count.get() > 3 ? children : null)}
       {() => (count.get() > 3 ? "greater than 3" : "less than 3")}
-      <div>{$(() => count.get())}</div>
+      <div>{() => count.get()}</div>
       {() => (count.get() > 3 ? <div>wha, wha</div> : <p>cool</p>)}
       {() => {
         if (count.get() % 2 === 0) {
@@ -55,6 +55,18 @@ function* Test(): Effect<JSX.Element> {
       todo.set([number, value, "load"]);
     }
 
-    yield <div>{JSON.stringify(value)}</div>;
+    yield (
+      <div>
+        {JSON.stringify(value)}
+        <button
+          onClick={() => {
+            const [number, value] = todo.get();
+            todo.set([number + 1, value, "request"]);
+          }}
+        >
+          refetch
+        </button>
+      </div>
+    );
   }
 }
