@@ -1,5 +1,3 @@
-/// <reference types="typed-html" />
-
 declare global {
   /**
    * Provides type definitions in JSX for htmx attributes.
@@ -54,7 +52,7 @@ declare global {
   type HxTriggers = keyof GlobalEventHandlersEventMap | HtmxUtils.HtmxEvents;
 
   /** @ignore */
-  declare namespace HtmxUtils {
+  namespace HtmxUtils {
     type HxOnMap = {
       [K in keyof GlobalEventHandlersEventMap as `hx-on-${K}`]?: string;
     } & { [K in HxOnHtmxEvents as `hx-on--${K}`]?: string };
@@ -829,7 +827,7 @@ declare global {
   }
 
   /** @ignore */
-  declare namespace JSX {
+  namespace JSX {
     interface HtmxExtensions extends HtmxBuiltinExtensions {}
 
     // typed-html
@@ -838,10 +836,4 @@ declare global {
 
   /** @ignore */
   interface HTMLElement extends HtmxAttributes {}
-}
-
-declare module "typed-html" {
-  namespace JSX {
-    type Element = unknown[];
-  }
 }

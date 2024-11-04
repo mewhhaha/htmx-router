@@ -7,14 +7,14 @@
   "scripts": {},
   "exports": {
     ".": {
-      "import": "./src/runtime.ts",
-      "types": "./src/runtime.ts"
+      "import": "./src/runtime.mts",
+      "types": "./src/runtime.mts"
     },
     "./client/jsx-runtime": {
-      "import": "./src/client/jsx-runtime.ts"
+      "import": "./src/client/jsx-runtime.mts"
     },
     "./server/jsx-runtime": {
-      "import": "./src/server/jsx-runtime.ts"
+      "import": "./src/server/jsx-runtime.mts"
     }
   },
   "keywords": [],

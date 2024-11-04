@@ -12,8 +12,8 @@
     "skipLibCheck": true
   },
   "include": [
-    "src/runtime.ts",
-    "src/hydrate-me.ts",
-    "src/client/jsx-runtime.ts"
+    "src/runtime.mts",
+    "src/hydrate-me.mts",
+    "src/client/jsx-runtime.mts"
   ]
 }

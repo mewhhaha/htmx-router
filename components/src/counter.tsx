@@ -16,11 +16,11 @@ export default function Counter({ children }: CounterProps) {
       >
         increment
       </button>
-      {$(() => (count.get() > 3 ? children : null))}
-      {$(() => (count.get() > 3 ? "greater than 3" : "less than 3"))}
+      {() => (count.get() > 3 ? children : null)}
+      {() => (count.get() > 3 ? "greater than 3" : "less than 3")}
       <div>{$(() => count.get())}</div>
-      {$(() => (count.get() > 3 ? <div>wha, wha</div> : <p>cool</p>))}
-      {$(() => {
+      {() => (count.get() > 3 ? <div>wha, wha</div> : <p>cool</p>)}
+      {() => {
         if (count.get() % 2 === 0) {
           return <div class="bg-black text-white">wha, wha</div>;
         }
@@ -30,13 +30,13 @@ export default function Counter({ children }: CounterProps) {
             <div class="bg-black text-white">ok</div>
           </>
         );
-      })}
-      {test()}
+      }}
+      <Test />
     </div>
   );
 }
 
-function* test(): Effect<JSX.Element> {
+function* Test(): Effect<JSX.Element> {
   const todo = useSignal<[number, null | unknown, "request" | "load" | "done"]>(
     [1, null, "request"],
   );

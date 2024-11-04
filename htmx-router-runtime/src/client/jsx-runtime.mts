@@ -1,11 +1,11 @@
+import "../common/typed.mjs";
 import { Signal } from "signal-polyfill";
 import morphdom from "morphdom";
 
-export const s = Symbol();
-
 declare global {
   namespace JSX {
-    export type AnyNode =
+    type Element = AnyNode | AnyNode[];
+    type AnyNode =
       | HTMLElement
       | string
       | number
@@ -14,13 +14,10 @@ declare global {
       | undefined
       | Generator<JSX.Element, JSX.Element, any>
       | AsyncGenerator<JSX.Element, JSX.Element, any>;
-    export type Element = AnyNode | AnyNode[];
-
-    export interface IntrinsicElements {
-      [key: string]: any;
-    }
   }
 }
+
+export const s = Symbol();
 
 export const Fragment = ({ children }: { children: JSX.Element }) => children;
 

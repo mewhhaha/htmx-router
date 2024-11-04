@@ -1,4 +1,9 @@
-import "./jsx.d.js";
+import "../common/htmx.mjs";
+declare global {
+  namespace JSX {
+    type Element = unknown[];
+  }
+}
 
 export const Fragment = ({ children }: { children: JSX.Element }) => children;
 

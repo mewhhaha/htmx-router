@@ -1,7 +1,7 @@
 import { Signal } from "signal-polyfill";
-export { define } from "./hydrate-me.js";
+export { define } from "./hydrate-me.mjs";
 
-export const useSignal = <t>(value: t) => {
+export const useSignal = <t,>(value: t) => {
   const signal = new Signal.State(value);
   return signal;
 };

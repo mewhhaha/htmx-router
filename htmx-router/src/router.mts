@@ -191,7 +191,8 @@ const routeResponse = async (
 
       const props = {
         loaderData,
-        children: i === fragments.length - 1 ? "" : render(i + 1),
+        children:
+          i === fragments.length - 1 ? "" : Promise.resolve(render(i + 1)),
       };
 
       let [tag, ...rest] = Component(props);
@@ -199,31 +200,40 @@ const routeResponse = async (
         return [""];
       }
 
-      if (parent) {
+      if (parent && typeof tag === "string") {
         tag = tag.replace(/^(<[a-z]+)/, `$1 data-children="${parent}"`);
       }
 
       return [tag, ...rest];
     };
 
+    let flushFirst = true;
+
     const chunks = await render(0);
     const writeChunks = async (chunks: unknown[]) => {
       for (let chunk of chunks) {
-        if (typeof chunk === "object" && chunk && "then" in chunk) {
-          // Flush the writer to ensure the chunk is written
+        // Flush the first chunk that likely includes the html, head, etc.
+        if (flushFirst && isPromise(chunk)) {
           await writer.write(text.encode("".padEnd(2048, "\n")));
+          flushFirst = false;
         }
+
+        // Cover the cases where the chunk is a promise
         const v = await chunk;
+
+        // Skip undefined, null, and false
         if (v === undefined || v === null || v === false) {
           continue;
         }
+
+        // Recursively handle arrays
         if (Array.isArray(v)) {
           await writeChunks(v);
-        } else if (typeof v === "string") {
-          await writer.write(text.encode(v));
-        } else {
-          await writer.write(text.encode(v.toString()));
+          continue;
         }
+
+        // Handle all other types by attempting to stringify
+        await writer.write(text.encode(v.toString()));
       }
     };
 
@@ -292,3 +302,6 @@ const loadAllHeaders = async (
   }
   return headerTask;
 };
+
+const isPromise = (value: unknown): value is Promise<unknown> =>
+  typeof value === "object" && value !== null && "then" in value;
