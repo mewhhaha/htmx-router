@@ -7,7 +7,7 @@ import {
 } from "node:fs/promises";
 import { createHash } from "node:crypto";
 
-const folders = ["../public"];
+const folders = ["./public"];
 const jsonOutput = "./app/import-map.json";
 const folderOutput = "./assets";
 

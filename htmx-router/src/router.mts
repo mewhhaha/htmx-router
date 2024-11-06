@@ -170,7 +170,7 @@ const routeResponse = async (
   const writer = stream.writable.getWriter();
 
   const write = async () => {
-    if (!target) {
+    if (target === undefined) {
       writer.write(text.encode("<!doctype html>"));
     }
     const render = async (i: number) => {

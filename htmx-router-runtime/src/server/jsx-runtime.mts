@@ -1,4 +1,4 @@
-import "../common/htmx.mjs";
+import "../common/typed.mjs";
 declare global {
   namespace JSX {
     type Element = unknown[];

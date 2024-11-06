@@ -10,11 +10,9 @@
       "import": "./src/runtime.mts",
       "types": "./src/runtime.mts"
     },
-    "./client/jsx-runtime": {
-      "import": "./src/client/jsx-runtime.mts"
-    },
     "./server/jsx-runtime": {
-      "import": "./src/server/jsx-runtime.mts"
+      "import": "./src/server/jsx-runtime.mts",
+      "types": "./src/server/jsx-runtime.mts"
     }
   },
   "keywords": [],
