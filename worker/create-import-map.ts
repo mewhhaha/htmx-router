@@ -7,7 +7,9 @@ import {
 } from "node:fs/promises";
 import { createHash } from "node:crypto";
 
-const folders = ["../components/dist"];
+const folders = ["../public"];
+const jsonOutput = "./app/import-map.json";
+const folderOutput = "./assets";
 
 const generateFingerprints = async (folder: string) => {
   const files = await readdir(folder);
@@ -34,7 +36,10 @@ const copyFolder = async (
   const files = await readdir(folder);
 
   for (const file of files) {
-    await copyFile(`${folder}/${file}`, `./public/${fingerprints[file]}`);
+    await copyFile(
+      `${folder}/${file}`,
+      `./${folderOutput}/${fingerprints[file]}`,
+    );
   }
 };
 
@@ -61,4 +66,4 @@ await Promise.all(folders.map((folder) => copyFolder(folder, fingerprints)));
 
 const importMap = JSON.stringify(readImportMap(fingerprints), null, 2);
 
-await writeFile("./app/import-map.json", importMap);
+await writeFile(jsonOutput, importMap);

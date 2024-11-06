@@ -45,5 +45,11 @@
     "rootDirs": ["./.router/types", "."]
   },
   "exclude": ["test"],
-  "include": ["app", "src", ".router/types/**/*"]
+  "include": [
+    "app",
+    "src",
+    ".router/types/**/*",
+    "public/idiomorph-htmx.js",
+    "public/idiomorph.js"
+  ]
 }

@@ -4,13 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node --experimental-strip-types --no-warnings create-import-map.ts",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "start": "wrangler dev",
     "test": "vitest",
     "cf-typegen": "wrangler types",
-    "routes": "fs-routes ./app"
+    "routes": "fs-routes ./app",
+    "import-map": "node --experimental-strip-types --no-warnings ./create-import-map.ts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241018.0",

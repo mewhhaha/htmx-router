@@ -2,26 +2,18 @@
 import * as root from "./root.tsx";
 import { route } from "htmx-router";
 import * as $home from "./routes/home.tsx";
-import * as $profiles__id from "./routes/profiles.$id.tsx";
-import * as $profiles from "./routes/profiles.tsx";
-import * as $profiles__a_a from "./routes/profiles._a.a.tsx";
-import * as $profiles__a_b from "./routes/profiles._a.b.tsx";
-import * as $profiles__a from "./routes/profiles._a.tsx";
-import * as $profiles__index from "./routes/profiles._index.tsx";
+import * as $_header_home from "./routes/_header.home.tsx";
+import * as $_header_profiles from "./routes/_header.profiles.tsx";
+import * as $_header from "./routes/_header.tsx";
 import * as $_index from "./routes/_index.tsx";
-const $$profiles__a_a = { id: "profiles._a.a", mod: $profiles__a_a };
-const $$profiles__a_b = { id: "profiles._a.b", mod: $profiles__a_b };
-const $$profiles__a = { id: "profiles._a", mod: $profiles__a };
-const $$profiles__index = { id: "profiles._index", mod: $profiles__index };
-const $$profiles__id = { id: "profiles.$id", mod: $profiles__id, params: ["id"] };
+const $$_header_home = { id: "_header.home", mod: $_header_home };
+const $$_header_profiles = { id: "_header.profiles", mod: $_header_profiles };
 const $$home = { id: "home", mod: $home };
-const $$profiles = { id: "profiles", mod: $profiles };
+const $$_header = { id: "_header", mod: $_header };
 const $$_index = { id: "_index", mod: $_index };
 const $root = { id: "", mod: root };
 
-export const routes: route[] = [["/profiles/a", [$root,$$profiles,$$profiles__a,$$profiles__a_a]],
-["/profiles/b", [$root,$$profiles,$$profiles__a,$$profiles__a_b]],
-["/profiles", [$root,$$profiles,$$profiles__index]],
-["/profiles/:id", [$root,$$profiles,$$profiles__id]],
+export const routes: route[] = [["/home", [$root,$$_header,$$_header_home]],
+["/profiles", [$root,$$_header,$$_header_profiles]],
 ["/home", [$root,$$home]],
 ["/", [$root,$$_index]]];
