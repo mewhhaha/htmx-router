@@ -1,5 +1,5 @@
 import path from "node:path";
-import { mkdir, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readdir, writeFile, rm } from "node:fs/promises";
 
 export const generateTypes = async (appFolder: string) => {
   const routesFolder = path.join(appFolder, "routes");
@@ -11,6 +11,7 @@ export const generateTypes = async (appFolder: string) => {
   const files = await readdir(routesFolder);
 
   const tasks: Promise<void>[] = [];
+  await rm(path.join(".router"), { recursive: true, force: true });
   await mkdir(path.join(".router", "types", routesFolder), { recursive: true });
   for (const file of files) {
     const params = file
@@ -41,6 +42,7 @@ import {
   InferComponentProps,
   InferHeaderArgs,
   InferLoaderArgs,
+  InferPartialArgs,
 } from "htmx-router/types";
 import * as r from "${file.replace(tsRegex, ".js")}";
 
@@ -50,6 +52,7 @@ export type RouteParams = {
 
 export type ComponentProps = InferComponentProps<typeof r>;
 export type LoaderArgs = InferLoaderArgs<RouteParams>;
+export type PartialArgs = InferPartialArgs<RouteParams>;
 export type ActionArgs = InferActionArgs<RouteParams>;
 export type HeaderArgs = InferHeaderArgs<RouteParams, typeof r>;
     `.trim();

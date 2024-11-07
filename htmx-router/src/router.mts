@@ -1,13 +1,16 @@
 import { match } from "./match.mjs";
 
+export const Chunk = Symbol("Chunk");
+
 export interface ctx {
   request: Request;
   params: Record<string, string>;
   context: [unknown, ExecutionContext];
 }
 
-export type loader = (params: any) => Promise<unknown>;
-export type action = (params: any) => Promise<unknown>;
+export type partial = (params: any) => JSX.Element | undefined;
+export type loader = (params: any) => any;
+export type action = (params: any) => any;
 export type renderer = (props: any) => JSX.Element;
 export type headers = (
   params: ctx & {
@@ -21,6 +24,7 @@ export type mod = {
   action?: action;
   default?: renderer;
   headers?: headers;
+  partial?: partial;
 };
 
 export type fragment = { id: string; mod: mod; params?: string[] };
@@ -36,7 +40,7 @@ export const Router = (routes: route[]): router => {
     request: Request,
     ...args: ctx["context"]
   ): Promise<Response> => {
-    const { target, fragments, params } = matchRoute(routes, request);
+    const { target, fragments, partials, params } = matchRoute(routes, request);
     if (!fragments) {
       return new Response(null, { status: 404 });
     }
@@ -48,7 +52,7 @@ export const Router = (routes: route[]): router => {
 
       if (request.method === "GET") {
         if (leaf.default) {
-          return await routeResponse(target, fragments, ctx);
+          return await routeResponse(target, fragments, partials, ctx);
         }
 
         if (leaf.loader) {
@@ -89,6 +93,7 @@ export const diff = (
     target: next.fragments.at(index - 1)?.id,
     params: next.params,
     fragments: next.fragments.slice(index),
+    partials: next.fragments.slice(0, index),
   };
 };
 
@@ -96,16 +101,21 @@ const matchRoute = (routes: route[], request: Request) => {
   const url = new URL(request.url);
   const next = findRoute(routes, url.pathname);
   if (!next) {
-    return { target: undefined, fragments: undefined, params: undefined };
+    return {
+      target: undefined,
+      fragments: undefined,
+      partials: undefined,
+      params: undefined,
+    };
   }
 
   const browserUrl = request.headers.get("hx-current-url");
   if (!browserUrl) {
-    return { target: undefined, ...next };
+    return { target: undefined, partials: [], ...next };
   }
   const current = findRoute(routes, new URL(browserUrl).pathname);
   if (!current) {
-    return { target: undefined, ...next };
+    return { target: undefined, partials: [], ...next };
   }
 
   return diff(current, next);
@@ -147,6 +157,7 @@ const loaderResponse = async (loader: loader, ctx: ctx) => {
 const routeResponse = async (
   target: string | undefined,
   fragments: fragment[],
+  partials: fragment[],
   ctx: ctx,
 ) => {
   const loaders = fragments.map((fragment) => fragment.mod.loader?.(ctx));
@@ -207,15 +218,17 @@ const routeResponse = async (
       return [tag, ...rest];
     };
 
-    let flushFirst = true;
-
     const chunks = await render(0);
+
+    for (const fragment of partials) {
+      chunks.push(fragment.mod.partial?.(ctx));
+    }
+
     const writeChunks = async (chunks: unknown[]) => {
       for (let chunk of chunks) {
-        // Flush the first chunk that likely includes the html, head, etc.
-        if (flushFirst && isPromise(chunk)) {
+        if (chunk === Chunk) {
           await writer.write(text.encode("".padEnd(2048, "\n")));
-          flushFirst = false;
+          continue;
         }
 
         // Cover the cases where the chunk is a promise
@@ -243,7 +256,6 @@ const routeResponse = async (
 
   ctx.context[1].waitUntil(write());
 
-  console.log(...headers.entries());
   return new Response(stream.readable, { headers, status: 200 });
 };
 

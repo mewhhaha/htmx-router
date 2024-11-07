@@ -13,6 +13,12 @@ export type InferLoaderArgs<params extends Record<string, string>> = {
   context: [unknown, ExecutionContext];
 };
 
+export type InferPartialArgs<params extends Record<string, string>> = {
+  request: Request;
+  params: params;
+  context: [unknown, ExecutionContext];
+};
+
 export type InferActionArgs<params extends Record<string, string>> = {
   request: Request;
   params: params;

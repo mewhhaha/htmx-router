@@ -1,4 +1,4 @@
-import { routes } from "../app/routes";
+import { routes } from "./routes";
 import { Router } from "htmx-router";
 
 type Env = {};

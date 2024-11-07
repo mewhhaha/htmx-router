@@ -48,6 +48,8 @@
   "include": [
     "app",
     "src",
+    "create-import-map.ts",
+    "tailwind.config.ts",
     ".router/types/**/*",
     "public/idiomorph-htmx.js",
     "public/idiomorph.js"

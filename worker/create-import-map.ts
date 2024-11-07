@@ -3,13 +3,15 @@ import {
   copyFile,
   writeFile,
   readFile,
+  mkdir,
   unlink,
 } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 
 const folders = ["./public"];
 const jsonOutput = "./app/import-map.json";
-const folderOutput = "./assets";
+const folderOutput = "./dist/assets";
 
 const generateFingerprints = async (folder: string) => {
   const files = await readdir(folder);
@@ -23,6 +25,10 @@ const generateFingerprints = async (folder: string) => {
 };
 
 const removeFolder = async (folder: string) => {
+  if (!existsSync(folder)) {
+    return;
+  }
+
   const files = await readdir(folder);
   for (const file of files) {
     await unlink(`${folder}/${file}`);
@@ -56,7 +62,8 @@ const readImportMap = (fingerprints: Record<string, string>) => {
   return importMap;
 };
 
-await removeFolder("./public");
+await removeFolder(folderOutput);
+await mkdir(folderOutput, { recursive: true });
 
 const fingerprints = await Promise.all(folders.map(generateFingerprints)).then(
   (f) => Object.assign({}, ...f),

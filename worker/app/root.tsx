@@ -1,18 +1,29 @@
+import { Chunk } from "htmx-router";
+import importMap from "./import-map.json";
+
 export default function Root({ children }: { children?: string }) {
   return (
-    <html hx-boost="true">
+    <html>
       <head>
         <meta charset="UTF-8"></meta>
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0"
         ></meta>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://unpkg.com/htmx.org@2.0.3"></script>
-        <script src="idiomorph.js"></script>
-        <script src="idiomorph-htmx.js"></script>
+        {Object.values(importMap.imports).map((src) => {
+          if (src.endsWith(".js")) {
+            return <script src={src}></script>;
+          }
+          if (src.endsWith(".css")) {
+            return <link rel="stylesheet" href={src} />;
+          }
+          return null;
+        })}
       </head>
-      <body class="bg-black text-white">{children}</body>
+      <body class="bg-black text-white" hx-boost="true" hx-ext="morph">
+        {Chunk}
+        {children}
+      </body>
     </html>
   );
 }

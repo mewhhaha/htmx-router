@@ -7,7 +7,7 @@ type LinkProps = {
 export const Link = ({ to, children, ...rest }: LinkProps) => {
   return (
     <a
-      class="text-blue-500 cursor-pointer hover:text-blue-600"
+      class='text-blue-500 cursor-pointer hover:text-blue-600 aria-[current="page"]:font-bold'
       href={to}
       {...rest}
     >
