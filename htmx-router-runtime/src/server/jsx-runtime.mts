@@ -28,6 +28,7 @@ export function jsx(
   const pre = `<${tag}${attrs ? ` ${attrs}` : ""}>`;
 
   const post = `</${tag}>`;
+
   return [pre, ...(Array.isArray(children) ? children : [children]), post];
 }
 

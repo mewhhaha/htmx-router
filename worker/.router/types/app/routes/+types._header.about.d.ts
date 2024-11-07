@@ -5,7 +5,7 @@ import {
   InferLoaderArgs,
   InferPartialArgs,
 } from "htmx-router/types";
-import * as r from "_header.about.js";
+import * as r from "./_header.about.js";
 
 export type RouteParams = {
   

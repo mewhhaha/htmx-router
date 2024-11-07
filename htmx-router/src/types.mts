@@ -1,7 +1,7 @@
 export type InferComponentProps<module> = {
   children: JSX.Element | undefined;
   loaderData: module extends {
-    loader: infer loader extends (...args: any) => any;
+    loader: infer loader extends (...args: any) => infer t;
   }
     ? Awaited<ReturnType<loader>>
     : never;

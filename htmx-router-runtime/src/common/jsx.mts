@@ -1,5 +1,8 @@
 declare global {
   namespace JSX {
+    interface ElementChildrenAttribute {
+      children: {};
+    }
     interface IntrinsicElements {
       a: HtmlAnchorTag;
       abbr: HtmlTag;

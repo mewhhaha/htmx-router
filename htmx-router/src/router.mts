@@ -1,6 +1,6 @@
+import { isFlush } from "./components.js";
 import { match } from "./match.mjs";
-
-export const Chunk = Symbol("Chunk");
+export { flush } from "./components.js";
 
 export interface ctx {
   request: Request;
@@ -161,13 +161,15 @@ const routeResponse = async (
   ctx: ctx,
 ) => {
   const loaders = fragments.map((fragment) => fragment.mod.loader?.(ctx));
+  const deferred: unknown[] = partials
+    .map((fragment) => fragment.mod.partial?.(ctx))
+    .filter((d) => d !== undefined && d !== null);
 
   const initHeaders = new Headers();
   initHeaders.set("content-type", "text/html");
   if (target) {
     initHeaders.set("hx-retarget", `[data-children="${target}"]`);
-    initHeaders.set("hx-swap", "outerHTML");
-    initHeaders.set("hx-trigger", "true");
+    initHeaders.set("hx-reswap", "outerHTML");
   } else {
     initHeaders.set("transfer-encoding", "chunked");
     initHeaders.set("connection", "keep-alive");
@@ -194,7 +196,7 @@ const routeResponse = async (
         mod: { default: Component },
       } = fragment;
 
-      const parent = fragments[i - 1]?.id;
+      const parent = fragments[i - 1]?.id ?? partials[partials.length - 1]?.id;
       const loaderData = await loaders[i];
       if (!Component) {
         return render(i + 1);
@@ -220,13 +222,11 @@ const routeResponse = async (
 
     const chunks = await render(0);
 
-    for (const fragment of partials) {
-      chunks.push(fragment.mod.partial?.(ctx));
-    }
-
     const writeChunks = async (chunks: unknown[]) => {
       for (let chunk of chunks) {
-        if (chunk === Chunk) {
+        // This flush only works on the initial html
+        // since htmx will await the full response before rendering
+        if (isFlush(chunk)) {
           await writer.write(text.encode("".padEnd(2048, "\n")));
           continue;
         }
@@ -245,12 +245,22 @@ const routeResponse = async (
           continue;
         }
 
-        // Handle all other types by attempting to stringify
         await writer.write(text.encode(v.toString()));
       }
     };
 
     await writeChunks(chunks);
+
+    if (deferred.length > 0) {
+      await writer.write(text.encode(`<template hx-swap="none">`));
+
+      for await (const value of race(deferred)) {
+        await writeChunks([value]);
+      }
+
+      await writer.write(text.encode(`</template>`));
+    }
+
     writer.close();
   };
 
@@ -315,5 +325,12 @@ const loadAllHeaders = async (
   return headerTask;
 };
 
-const isPromise = (value: unknown): value is Promise<unknown> =>
-  typeof value === "object" && value !== null && "then" in value;
+async function* race(tasks: unknown[]) {
+  while (tasks.length > 0) {
+    const [promise, value] = await Promise.race(
+      tasks.map(async (d) => [d, await d]),
+    );
+    yield value;
+    tasks = tasks.filter((p) => p !== promise);
+  }
+}

@@ -44,7 +44,7 @@ import {
   InferLoaderArgs,
   InferPartialArgs,
 } from "htmx-router/types";
-import * as r from "${file.replace(tsRegex, ".js")}";
+import * as r from "./${file.replace(tsRegex, ".js")}";
 
 export type RouteParams = {
   ${params}

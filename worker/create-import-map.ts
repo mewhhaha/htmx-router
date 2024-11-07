@@ -8,6 +8,9 @@ import {
 } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { createHash } from "node:crypto";
+import process from "node:process";
+
+const dev = process.argv.includes("--dev");
 
 const folders = ["./public"];
 const jsonOutput = "./app/import-map.json";
@@ -56,7 +59,11 @@ const readImportMap = (fingerprints: Record<string, string>) => {
 
   for (const file in fingerprints) {
     const name = file.split(".").slice(0, -1).join("/");
-    importMap.imports[name] = `/${fingerprints[file]}`;
+    if (dev) {
+      importMap.imports[name] = `/${file}`;
+    } else {
+      importMap.imports[name] = `/${fingerprints[file]}`;
+    }
   }
 
   return importMap;
