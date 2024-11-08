@@ -1,6 +1,7 @@
 export default function Blog() {
   return (
-    <main class="max-w-3xl w-full mx-auto bg-red-300 p-12">
+    <main class="mx-auto w-full max-w-3xl bg-red-300 p-12">
+      <title>Blog</title>
       This is the blog page
     </main>
   );

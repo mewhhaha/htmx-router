@@ -332,5 +332,18 @@ declare global {
       width?: string;
       height?: string;
     }
+    interface HtmlSvgTag extends HtmlTag {
+      xmlns?: string;
+      fill?: string;
+      viewBox?: string;
+      "stroke-width"?: string;
+      stroke?: string;
+      class?: string;
+    }
+    interface HtmlPathTag extends HtmlTag {
+      "stroke-linecap"?: string;
+      "stroke-linejoin"?: string;
+      d?: string;
+    }
   }
 }

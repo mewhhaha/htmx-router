@@ -1,7 +1,7 @@
 declare global {
   namespace JSX {
     interface ElementChildrenAttribute {
-      children: {};
+      children: JSX.Element;
     }
     interface IntrinsicElements {
       a: HtmlAnchorTag;
@@ -116,6 +116,8 @@ declare global {
       var: HtmlTag;
       video: HtmlVideoTag;
       wbr: HtmlTag;
+      svg: HtmlSvgTag;
+      path: HtmlPathTag;
     }
   }
 }

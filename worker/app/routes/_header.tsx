@@ -4,20 +4,28 @@ import * as t from "./+types._header";
 const links = [
   { to: "/blog", label: "Blog" },
   { to: "/about", label: "About" },
+  { to: "/store", label: "Store" },
 ];
 
-const HeaderLink = (props: NavLinkProps) => {
+const HeaderLink = ({ children, ...props }: NavLinkProps) => {
   return (
     <NavLink
       id={sanitize(props.to)}
       {...props}
       class={`
-        bg-slate-100 rounded-md text-slate-900 px-2 min-w-16 text-center py-1 underline font-fancy
-        hover:bg-blue-50 hover:text-blue-900
-        aria-[current="page"]:bg-blue-100 aria-[current="page"]:no-underline
-        ${props.class || ""}
-    `}
-    />
+          group
+          font-fancy relative min-w-16 rounded border border-blue-300 bg-slate-100 px-2 py-1 text-center text-slate-900 underline
+        hover:bg-blue-50 hover:text-blue-900 
+        aria-[current="page"]:bg-blue-100 aria-[current="page"]:no-underline 
+        ${props.class || ""}`}
+    >
+      {children}
+      <div
+        class={`
+          absolute -inset-x-2 -bottom-1 h-1 scale-x-0 rounded bg-blue-500 transition-transform ease-in-out
+        group-aria-[current="page"]:scale-x-100`}
+      />
+    </NavLink>
   );
 };
 
@@ -45,10 +53,10 @@ export const partial = ({ request }: t.PartialArgs) => {
 
   return (
     <>
-      <HeaderLink to={prev.to} hx-swap-oob="true">
+      <HeaderLink to={prev.to} hx-swap-oob="morph">
         {prev.label}
       </HeaderLink>
-      <HeaderLink to={next.to} active hx-swap-oob="true">
+      <HeaderLink to={next.to} active hx-swap-oob="morph">
         {next.label}
       </HeaderLink>
     </>
@@ -63,11 +71,11 @@ export default function Route({
 
   return (
     <div class="flex flex-col">
-      <header class="w-full bg-slate-100 border-b border-black shadow px-2 py-1 grid grid-cols-[1fr_auto_1fr]">
-        <div class="flex col-start-2">
+      <header class="grid w-full grid-cols-[1fr_auto_1fr] border-b border-black bg-slate-100 px-2 py-1 shadow">
+        <div class="col-start-2 flex">
           <h1 class="text-2xl font-bold text-black">jacob</h1>
-          <div class="rounded-4xl border-black border-b size-10"></div>
-          <nav class="flex gap-4 mx-auto border-t border-black rounded-4xl px-4 py-2">
+          <div class="size-10 rounded-4xl border-b border-black"></div>
+          <nav class="mx-auto flex gap-4 rounded-4xl border-t border-black px-4 py-2">
             {links.map(({ to, label }) => {
               return (
                 <HeaderLink to={to} active={active?.to === to}>

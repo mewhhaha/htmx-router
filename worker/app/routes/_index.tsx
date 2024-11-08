@@ -6,5 +6,5 @@ const redirect = (location: string) => {
 };
 
 export const loader = () => {
-  throw redirect("/home");
+  throw redirect("/blog");
 };

@@ -1,6 +1,5 @@
 export type NavLinkProps = {
   to: string;
-  children?: string;
   active?: boolean;
 } & JSX.IntrinsicElements["a"];
 

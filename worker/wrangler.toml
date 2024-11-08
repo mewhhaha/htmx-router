@@ -6,6 +6,11 @@ compatibility_flags = ["nodejs_compat"]
 assets = { directory = "./dist/assets", binding = "ASSETS" }
 
 
+[[d1_databases]]
+binding = "DB"
+database_name = "d1-toes-database"
+database_id = "dbd18f73-6a41-457a-8564-dacc81781fe0"
+
 # Workers Logs
 # Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
 # Configuration: https://developers.cloudflare.com/workers/observability/logs/workers-logs/#enable-workers-logs
