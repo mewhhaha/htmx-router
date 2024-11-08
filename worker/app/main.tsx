@@ -1,11 +1,9 @@
 import { routes } from "./routes";
-import { Router } from "htmx-router";
+import { Router, Env } from "htmx-router";
 
-type Env = {};
-
-declare global {
-  interface ctx {
-    context: [Env, ExecutionContext];
+declare module "htmx-router" {
+  interface Env {
+    DB: D1Database;
   }
 }
 

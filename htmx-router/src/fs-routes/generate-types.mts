@@ -1,12 +1,11 @@
 import path from "node:path";
 import { mkdir, readdir, writeFile, rm } from "node:fs/promises";
 
+const unescapedDotRegex = /(?<!\[)\.(?![^[]*\])/g;
+const tsRegex = /\.(m)?ts(x)?$/;
+
 export const generateTypes = async (appFolder: string) => {
   const routesFolder = path.join(appFolder, "routes");
-
-  const unescapedDotRegex = /(?<!\[)\.(?![^[]*\])/g;
-
-  const tsRegex = /\.(m)?ts(x)?$/;
 
   const files = await readdir(routesFolder);
 
@@ -36,7 +35,32 @@ export const generateTypes = async (appFolder: string) => {
       .map((name) => `\t${name}: string;`)
       .join("\n");
 
-    const template = `
+    const template = createTemplate(file, params);
+
+    const task = writeFile(
+      path.join(
+        ".router",
+        "types",
+        routesFolder,
+        `+types.${file.replace(tsRegex, ".d.ts")}`,
+      ),
+      template,
+    );
+    tasks.push(task);
+  }
+
+  const rootTemplate = createTemplate("root", "");
+  const task = writeFile(
+    path.join(".router", "types", appFolder, "+types.root.d.ts"),
+    rootTemplate,
+  );
+  tasks.push(task);
+
+  await Promise.all(tasks);
+};
+
+const createTemplate = (file: string, params: string) => {
+  const template = `
 import {
   InferActionArgs,
   InferComponentProps,
@@ -57,17 +81,5 @@ export type ActionArgs = InferActionArgs<RouteParams>;
 export type HeaderArgs = InferHeaderArgs<RouteParams, typeof r>;
     `.trim();
 
-    const task = writeFile(
-      path.join(
-        ".router",
-        "types",
-        routesFolder,
-        `+types.${file.replace(tsRegex, ".d.ts")}`,
-      ),
-      template,
-    );
-    tasks.push(task);
-  }
-
-  await Promise.all(tasks);
+  return template;
 };

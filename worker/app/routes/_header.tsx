@@ -14,16 +14,17 @@ const HeaderLink = ({ children, ...props }: NavLinkProps) => {
       {...props}
       class={`
           group
-          font-fancy relative min-w-16 rounded border border-blue-300 bg-slate-100 px-2 py-1 text-center text-slate-900 underline
-        hover:bg-blue-50 hover:text-blue-900 
-        aria-[current="page"]:bg-blue-100 aria-[current="page"]:no-underline 
+          font-fancy
+          aria-[current="page"]: relative min-w-16 rounded rounded-b-none border border-slate-300 bg-slate-100 px-2 py-1 text-center text-slate-900
+        underline
+        aria-[current="page"]:bg-slate-800 aria-[current="page"]:text-slate-100 aria-[current="page"]:no-underline
         ${props.class || ""}`}
     >
       {children}
       <div
         class={`
-          absolute -inset-x-2 -bottom-1 h-1 scale-x-0 rounded bg-blue-500 transition-transform ease-in-out
-        group-aria-[current="page"]:scale-x-100`}
+          absolute -inset-x-2 -bottom-1 h-1 scale-x-0 rounded bg-black transition-transform ease-in-out group-hover:scale-x-25
+        group-focus-visible:bg-blue-500 group-aria-[current="page"]:scale-x-100`}
       />
     </NavLink>
   );
@@ -73,9 +74,9 @@ export default function Route({
     <div class="flex flex-col">
       <header class="grid w-full grid-cols-[1fr_auto_1fr] border-b border-black bg-slate-100 px-2 py-1 shadow">
         <div class="col-start-2 flex">
-          <h1 class="text-2xl font-bold text-black">jacob</h1>
+          <h1 class="text-2xl font-bold text-slate-700">jacob</h1>
           <div class="size-10 rounded-4xl border-b border-black"></div>
-          <nav class="mx-auto flex gap-4 rounded-4xl border-t border-black px-4 py-2">
+          <nav class="mx-auto flex gap-4 rounded-4xl border-t border-slate-900 px-4 py-2">
             {links.map(({ to, label }) => {
               return (
                 <HeaderLink to={to} active={active?.to === to}>

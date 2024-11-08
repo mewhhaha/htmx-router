@@ -2,13 +2,15 @@ import { isFlush } from "./components.js";
 import { match } from "./match.mjs";
 export { flush } from "./components.js";
 
+export interface Env {}
+
 export interface ctx {
   request: Request;
   params: Record<string, string>;
-  context: [unknown, ExecutionContext];
+  context: [Env, ExecutionContext];
 }
 
-export type partial = (params: any) => JSX.Element | undefined;
+export type partial = (params: any) => JSX.Element | undefined | null;
 export type loader = (params: any) => any;
 export type action = (params: any) => any;
 export type renderer = (props: any) => JSX.Element;
@@ -222,12 +224,14 @@ const routeResponse = async (
 
     const chunks = await render(0);
 
+    let t = 0;
+
     const writeChunks = async (chunks: unknown[]) => {
       for (let chunk of chunks) {
         // This flush only works on the initial html
         // since htmx will await the full response before rendering
         if (isFlush(chunk)) {
-          await writer.write(text.encode("".padEnd(2048, "\n")));
+          await writer.write(text.encode("".padEnd(2048 - t, "\n")));
           continue;
         }
 
@@ -245,7 +249,9 @@ const routeResponse = async (
           continue;
         }
 
-        await writer.write(text.encode(v.toString()));
+        const s = v.toString();
+        t += s.length;
+        await writer.write(text.encode(s));
       }
     };
 
@@ -314,6 +320,7 @@ const loadAllHeaders = async (
         loaderData,
         headers: copy,
       });
+      console.log(extraHeaders);
       if (!extraHeaders) {
         return copy;
       }

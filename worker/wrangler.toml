@@ -8,8 +8,8 @@ assets = { directory = "./dist/assets", binding = "ASSETS" }
 
 [[d1_databases]]
 binding = "DB"
-database_name = "d1-toes-database"
-database_id = "dbd18f73-6a41-457a-8564-dacc81781fe0"
+database_name = "d1-toes-app"
+database_id = "8f96e680-f627-48c6-8e53-e90c2ecf19c4"
 
 # Workers Logs
 # Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/

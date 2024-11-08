@@ -1,8 +1,9 @@
 {
   "imports": {
-    "htmx": "/htmx.js",
-    "idiomorph-htmx": "/idiomorph-htmx.js",
-    "idiomorph": "/idiomorph.js",
-    "styles": "/styles.css"
+    "htmx": "/1bac1c23a4343663-htmx.js",
+    "idiomorph-htmx": "/1c2037c257078cdf-idiomorph-htmx.js",
+    "idiomorph": "/d7420fb78a31518e-idiomorph.js",
+    "product": "/48e2499b17009be0-product.jpg",
+    "styles": "/de90180ceb5b1791-styles.css"
   }
 }

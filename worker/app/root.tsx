@@ -1,5 +1,10 @@
+import * as t from "./+types.root";
 import { flush } from "htmx-router";
 import importMap from "./import-map.json";
+
+export const headers = ({ headers }: t.HeaderArgs) => {
+  headers.set("strict-transport-security", "max-age=31536000");
+};
 
 export default function Root({ children }: { children?: string }) {
   return (
