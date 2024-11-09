@@ -257,7 +257,6 @@ const loadAllHeaders = async (
         loaderData,
         headers: copy,
       });
-      console.log(extraHeaders);
       if (!extraHeaders) {
         return copy;
       }

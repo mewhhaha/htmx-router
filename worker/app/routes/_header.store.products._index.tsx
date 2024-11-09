@@ -25,7 +25,16 @@ export const action = async ({
 }: t.ActionArgs) => {
   const formData = await request.formData();
   const q = formData.get("q")?.toString() || "";
-  const { products } = await getProducts(env.DB, q);
+
+  const cacheOrGetProducts = async () => {
+    const cached = await getCachedProducts(q);
+    if (cached) {
+      return { products: cached };
+    }
+
+    return await getProducts(env.DB, q);
+  };
+  const { products } = await cacheOrGetProducts();
 
   const searchParams = new URLSearchParams();
   if (q) {
@@ -78,7 +87,7 @@ export default function Store({
             >
               Search for items
             </label>
-            <div class="group relative isolate flex w-96 bg-white text-black">
+            <div class="group relative isolate flex w-full max-w-96 bg-white text-black">
               <input
                 id="search"
                 name="q"

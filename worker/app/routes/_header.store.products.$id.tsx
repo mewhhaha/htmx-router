@@ -62,12 +62,12 @@ export default function Product({ loaderData: { product } }: t.ComponentProps) {
   return (
     <main class="mx-auto w-full max-w-3xl bg-red-300 p-12">
       <title>{product.title}</title>
-      <article>
+      <article class="flex w-full flex-col">
         <h1 class="font-fancy mb-10 text-2xl font-bold text-pink-900">
           {product.title}
         </h1>
-        <div class="flex gap-8">
-          <div class="isolate grid w-1/2 [&>*]:[grid-area:1/1]">
+        <div class="flex grow flex-col gap-8 sm:flex-row">
+          <div class="isolate grid sm:w-1/2 [&>*]:[grid-area:1/1]">
             <img
               src={product.image}
               aria-hidden="true"
@@ -86,7 +86,7 @@ export default function Product({ loaderData: { product } }: t.ComponentProps) {
             />
           </div>
 
-          <div class="w-1/2 space-y-6">
+          <div class="space-y-6 sm:w-1/2">
             <div class="bg-white/80 p-4 shadow">
               <h2 class="font-fancy mb-2 text-2xl font-bold text-pink-900">
                 Details
