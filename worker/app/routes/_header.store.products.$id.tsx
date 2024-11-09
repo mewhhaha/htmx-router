@@ -10,6 +10,26 @@ type Product = {
   rating_count: number;
 };
 
+const cacheKeyProduct = (id: string) => {
+  const url = new URL(`https://toes.life/store/products/${id}`);
+  return new Request(url);
+};
+
+const cacheProduct = async (id: string, product: Product) => {
+  const cacheKey = cacheKeyProduct(id);
+  const response = new Response(JSON.stringify(product), {
+    headers: { "cache-control": "max-age=3600" },
+  });
+  await caches.default.put(cacheKey, response);
+};
+
+const getCachedProduct = async (id: string) => {
+  const cacheKey = cacheKeyProduct(id);
+  const response = await caches.default.match(cacheKey);
+  if (!response) return undefined;
+  return await response.json<Product>();
+};
+
 const getProduct = async (db: D1Database, id: string) => {
   const product = await db
     .prepare("SELECT * FROM items WHERE id = ? LIMIT 1")
@@ -25,9 +45,16 @@ const getProduct = async (db: D1Database, id: string) => {
 
 export const loader = async ({
   params: { id },
-  context: [env],
+  context: [env, ctx],
 }: t.LoaderArgs) => {
+  const cachedProduct = await getCachedProduct(id);
+  if (cachedProduct) {
+    return { product: cachedProduct };
+  }
   const { product } = await getProduct(env.DB, id);
+
+  ctx.waitUntil(cacheProduct(id, product));
+
   return { product };
 };
 
