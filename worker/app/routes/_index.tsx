@@ -1,9 +1,4 @@
-const redirect = (location: string) => {
-  return new Response(null, {
-    status: 302,
-    headers: { Location: location },
-  });
-};
+import { redirect } from "htmx-router";
 
 export const loader = () => {
   throw redirect("/blog");

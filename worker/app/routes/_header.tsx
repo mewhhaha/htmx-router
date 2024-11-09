@@ -4,7 +4,7 @@ import * as t from "./+types._header";
 const links = [
   { to: "/blog", label: "Blog" },
   { to: "/about", label: "About" },
-  { to: "/store", label: "Store" },
+  { to: "/store/products", label: "Store" },
 ];
 
 const HeaderLink = ({ children, ...props }: NavLinkProps) => {

@@ -1,6 +1,5 @@
-import { isFlush } from "./components.js";
 import { match } from "./match.mjs";
-export { flush } from "./components.js";
+export { redirect } from "./responses.js";
 
 export interface Env {}
 
@@ -16,10 +15,10 @@ export type action = (params: any) => any;
 export type renderer = (props: any) => JSX.Element;
 export type headers = (
   params: ctx & {
-    readonly loaderData: Promise<unknown> | undefined;
+    loaderData: any | never;
     headers: Headers;
   },
-) => Headers | Promise<Headers>;
+) => void | Promise<void>;
 
 export type mod = {
   loader?: loader;
@@ -162,117 +161,55 @@ const routeResponse = async (
   partials: fragment[],
   ctx: ctx,
 ) => {
-  const loaders = fragments.map((fragment) => fragment.mod.loader?.(ctx));
   const deferred: unknown[] = partials
     .map((fragment) => fragment.mod.partial?.(ctx))
     .filter((d) => d !== undefined && d !== null);
 
+  const loaders = await Promise.all(
+    fragments.map((fragment) => fragment.mod.loader?.(ctx)),
+  );
+
   const initHeaders = new Headers();
   initHeaders.set("content-type", "text/html");
+
   if (target) {
     initHeaders.set("hx-retarget", `[data-children="${target}"]`);
     initHeaders.set("hx-reswap", "outerHTML");
-  } else {
-    initHeaders.set("transfer-encoding", "chunked");
-    initHeaders.set("connection", "keep-alive");
   }
 
   const headers = await loadAllHeaders(initHeaders, ctx, fragments, loaders);
 
-  const text = new TextEncoder();
-
-  const stream = new TransformStream();
-  const writer = stream.writable.getWriter();
-
   const write = async () => {
-    if (target === undefined) {
-      writer.write(text.encode("<!doctype html>"));
-    }
-    const render = async (i: number) => {
-      const fragment = fragments[i];
-      if (!fragment) {
-        return [""];
-      }
-
-      const {
-        mod: { default: Component },
-      } = fragment;
-
+    let html = target === undefined ? "<!doctype html>" : "";
+    const render = fragments.reduceRight(async (curr, next, i) => {
+      const loaderData = loaders[i];
       const parent = fragments[i - 1]?.id ?? partials[partials.length - 1]?.id;
-      const loaderData = await loaders[i];
-      if (!Component) {
-        return render(i + 1);
+      const Component = next.mod.default;
+      let t = await (Component?.({ loaderData, children: curr }) ?? curr);
+      if (parent && typeof t === "string") {
+        t = t.replace(/^(<[a-z]+)/, `$1 data-children="${parent}"`);
       }
+      return t;
+    }, Promise.resolve(""));
 
-      const props = {
-        loaderData,
-        children:
-          i === fragments.length - 1 ? "" : Promise.resolve(render(i + 1)),
-      };
-
-      let [tag, ...rest] = Component(props);
-      if (!tag) {
-        return [""];
-      }
-
-      if (parent && typeof tag === "string") {
-        tag = tag.replace(/^(<[a-z]+)/, `$1 data-children="${parent}"`);
-      }
-
-      return [tag, ...rest];
-    };
-
-    const chunks = await render(0);
-
-    let t = 0;
-
-    const writeChunks = async (chunks: unknown[]) => {
-      for (let chunk of chunks) {
-        // This flush only works on the initial html
-        // since htmx will await the full response before rendering
-        if (isFlush(chunk)) {
-          await writer.write(text.encode("".padEnd(2048 - t, "\n")));
-          continue;
-        }
-
-        // Cover the cases where the chunk is a promise
-        const v = await chunk;
-
-        // Skip undefined, null, and false
-        if (v === undefined || v === null || v === false) {
-          continue;
-        }
-
-        // Recursively handle arrays
-        if (Array.isArray(v)) {
-          await writeChunks(v);
-          continue;
-        }
-
-        const s = v.toString();
-        t += s.length;
-        await writer.write(text.encode(s));
-      }
-    };
-
-    await writeChunks(chunks);
+    html += await render;
 
     if (deferred.length > 0) {
-      await writer.write(text.encode(`<template hx-swap="none">`));
+      html += `<template hx-swap="none">`;
 
-      for await (const value of race(deferred)) {
-        await writeChunks([value]);
+      for await (const value of deferred) {
+        html += value;
       }
 
-      await writer.write(text.encode(`</template>`));
+      html += `</template>`;
     }
-
-    writer.close();
+    return html;
   };
 
-  ctx.context[1].waitUntil(write());
-
-  return new Response(stream.readable, { headers, status: 200 });
+  return new Response(await write(), {
+    headers,
+    status: 200,
+  });
 };
 
 const findDiffIndex = (
@@ -331,13 +268,3 @@ const loadAllHeaders = async (
   }
   return headerTask;
 };
-
-async function* race(tasks: unknown[]) {
-  while (tasks.length > 0) {
-    const [promise, value] = await Promise.race(
-      tasks.map(async (d) => [d, await d]),
-    );
-    yield value;
-    tasks = tasks.filter((p) => p !== promise);
-  }
-}

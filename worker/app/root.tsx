@@ -1,5 +1,4 @@
 import * as t from "./+types.root";
-import { flush } from "htmx-router";
 import importMap from "./import-map.json";
 
 export const headers = ({ headers }: t.HeaderArgs) => {
@@ -40,7 +39,6 @@ export default function Root({ children }: { children?: string }) {
         hx-boost="true"
         hx-ext="morph"
       >
-        {flush()}
         {children}
       </body>
     </html>

@@ -13,7 +13,7 @@ const handler: ExportedHandler<Env> = {
   fetch: async (request, env, ctx) => {
     const response = await router.handle(request, env, ctx);
     if (response.headers.get("HX-Reswap")) {
-      response.headers.set("HX-Reswap", "morph:outerHTML");
+      response.headers.set("HX-Reswap", "morph:outerHTML show:no-scroll");
     }
     return response;
   },

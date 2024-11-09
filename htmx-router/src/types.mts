@@ -6,7 +6,7 @@ export type InferComponentProps<module> = {
     loader: infer loader extends (...args: any) => any;
   }
     ? Awaited<ReturnType<loader>>
-    : never;
+    : undefined;
 };
 
 export type InferLoaderArgs<params extends Record<string, string>> = {
@@ -30,9 +30,10 @@ export type InferActionArgs<params extends Record<string, string>> = {
 export type InferHeaderArgs<params extends Record<string, string>, module> = {
   params: params;
   headers: Headers;
+  context: [Env, ExecutionContext];
   loaderData: module extends {
     loader: infer loader extends (...args: any) => any;
   }
     ? ReturnType<loader>
-    : never;
+    : undefined;
 };
