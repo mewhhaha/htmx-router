@@ -1,4 +1,4 @@
-import "../common/typed.mjs";
+import "./typed.mjs";
 declare global {
   namespace JSX {
     type Element = Promise<string>;

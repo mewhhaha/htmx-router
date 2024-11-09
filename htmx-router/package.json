@@ -19,6 +19,10 @@
     "./types": {
       "import": "./src/types.mts",
       "types": "./src/types.mts"
+    },
+    "./jsx-runtime": {
+      "import": "./src/runtime/jsx-runtime.mts",
+      "types": "./src/runtime/jsx-runtime.mts"
     }
   },
   "keywords": [],
