@@ -1,6 +1,6 @@
 # htmx-router
 
-My attempt at making a router for htmx that copies a bunch of features from react-rotuer.
+My attempt at making a router for htmx that copies a bunch of features from react-router. The router doesn't serve any assets, so you still have to supply the htmx files yourself. In this example I use htmx and idiomorph for the html swaps.
 
 ## Nested routes
 
@@ -12,7 +12,7 @@ Easily create nested routes that automatically handles what fragments to swap.
 
 ## File based routes
 
-Using the same file structure as react-router, we can easily create routes.
+Using the same file structure as react-router.
 
 ```bash
 _header.tsx # pathless layout route
@@ -21,6 +21,8 @@ _header.contact.tsx # /contact
 _header.store.products._index.tsx # /store/products
 _header.store.products.$id.tsx # /store/products/:id
 ```
+
+Also creates types for each route as they do in react-router 7, so you can access your loaderData in a typed way.
 
 ## Loaders
 
