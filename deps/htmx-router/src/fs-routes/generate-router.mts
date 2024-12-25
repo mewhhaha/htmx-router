@@ -1,6 +1,6 @@
 import { readdir, writeFile } from "node:fs/promises";
 import path from "node:path/posix";
-import { bySpecificity } from "./sort.mjs";
+import { bySpecificity } from "./sort.mts";
 
 export const generateRouter = async (appFolder: string) => {
   const routesFolder = path.join(appFolder, "routes");
@@ -85,7 +85,7 @@ export const generateRouter = async (appFolder: string) => {
 
   const file = `
 import * as root from "./root.tsx";
-import { route } from "htmx-router";
+import { type route } from "@mewhhaha/htmx-router";
 ${routeImports}
 ${routeVars}
 const $root = { id: "", mod: root };

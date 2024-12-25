@@ -1,5 +1,5 @@
-import { redirect } from "htmx-router";
-import * as t from "./+types._header.store.products.$id";
+import { redirect } from "@mewhhaha/htmx-router";
+import type * as t from "./+types._header.store.products.$id";
 type Product = {
   id: string;
   title: string;
@@ -60,67 +60,104 @@ export const loader = async ({
 
 export default function Product({ loaderData: { product } }: t.ComponentProps) {
   return (
-    <main class="mx-auto w-full max-w-3xl bg-red-300 p-12">
+    <main class={`mx-auto w-full max-w-3xl bg-red-300 p-12`}>
       <title>{product.title}</title>
-      <article class="flex w-full flex-col">
-        <h1 class="font-fancy mb-10 text-2xl font-bold text-pink-900">
+      <article class={`flex w-full flex-col`}>
+        <h1 class={`mb-10 font-fancy text-2xl font-bold text-pink-900`}>
           {product.title}
         </h1>
-        <div class="flex grow flex-col gap-8 sm:flex-row">
-          <div class="isolate grid sm:w-1/2 [&>*]:[grid-area:1/1]">
+        <div
+          class={`
+          flex grow flex-col gap-8
+
+          sm:flex-row
+          `}
+        >
+          <div
+            class={`
+            isolate grid
+
+            sm:w-1/2
+
+            [&>*]:[grid-area:1/1]
+            `}
+          >
             <img
               src={product.image}
               aria-hidden="true"
-              class="m-4 aspect-square w-full rotate-2 border-4 border-pink-400 bg-white object-cover pr-4 shadow-lg"
+              class={`
+              m-4 aspect-square w-full rotate-2 border-4 border-pink-400 bg-white
+              object-cover pr-4 shadow-lg
+              `}
             />
             <img
               src={product.image}
               aria-hidden="true"
-              class="m-2 aspect-square w-full rotate-1 border-4 border-pink-400 bg-white object-cover shadow-lg"
+              class={`
+              m-2 aspect-square w-full rotate-1 border-4 border-pink-400 bg-white
+              object-cover shadow-lg
+              `}
             />
 
             <img
               src={product.image}
               alt={product.title}
-              class="aspect-square w-full rotate-0 border-4 border-pink-400 bg-white object-cover shadow-lg"
+              class={`aspect-square w-full rotate-0 border-4 border-pink-400 bg-white object-cover shadow-lg`}
             />
           </div>
 
-          <div class="space-y-6 sm:w-1/2">
-            <div class="bg-white/80 p-4 shadow">
-              <h2 class="font-fancy mb-2 text-2xl font-bold text-pink-900">
+          <div
+            class={`
+            space-y-6
+
+            sm:w-1/2
+            `}
+          >
+            <div class={`bg-white/80 p-4 shadow`}>
+              <h2 class={`mb-2 font-fancy text-2xl font-bold text-pink-900`}>
                 Details
               </h2>
-              <p class="text-gray-700">{product.description}</p>
+              <p class={`text-gray-700`}>{product.description}</p>
             </div>
 
-            <div class="bg-white/80 p-4 shadow">
-              <h2 class="font-fancy mb-2 text-xl font-bold text-pink-900">
+            <div class={`bg-white/80 p-4 shadow`}>
+              <h2 class={`mb-2 font-fancy text-xl font-bold text-pink-900`}>
                 Category
               </h2>
               <a
                 href={`/store/products?q=${product.category}`}
-                class="text-blue-600 underline hover:text-blue-800"
+                class={`
+                text-blue-600 underline
+
+                hover:text-blue-800
+                `}
               >
                 {product.category}
               </a>
             </div>
 
-            <div class="bg-white/80 p-4 shadow">
-              <h2 class="font-fancy mb-2 text-xl font-bold text-pink-900">
+            <div class={`bg-white/80 p-4 shadow`}>
+              <h2 class={`mb-2 font-fancy text-xl font-bold text-pink-900`}>
                 Rating
               </h2>
-              <div class="flex items-center gap-2">
-                <span class="text-lg font-bold text-slate-800">
+              <div class={`flex items-center gap-2`}>
+                <span class={`text-lg font-bold text-slate-800`}>
                   {product.rating_rate}/5
                 </span>
-                <span class="text-sm text-gray-600">
+                <span class={`text-sm text-gray-600`}>
                   ({product.rating_count} reviews)
                 </span>
               </div>
             </div>
 
-            <button class="w-full cursor-pointer border-b-4 bg-white px-4 py-2 text-pink-600 transition-transform hover:rotate-1 hover:border-b-white hover:bg-pink-600 hover:text-white">
+            <button
+              class={`
+              w-full cursor-pointer border-b-4 bg-white px-4 py-2 text-pink-600
+              transition-transform
+
+              hover:rotate-1 hover:border-b-white hover:bg-pink-600 hover:text-white
+              `}
+            >
               Add to Cart
             </button>
           </div>

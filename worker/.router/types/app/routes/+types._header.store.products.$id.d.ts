@@ -4,7 +4,7 @@ import {
   InferHeaderArgs,
   InferLoaderArgs,
   InferPartialArgs,
-} from "htmx-router/types";
+} from "@mewhhaha/htmx-router/types";
 import * as r from "./_header.store.products.$id.js";
 
 export type RouteParams = {

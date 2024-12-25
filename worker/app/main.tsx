@@ -1,7 +1,7 @@
 import { routes } from "./routes";
-import { Router, Env } from "htmx-router";
+import { Router, type Env } from "@mewhhaha/htmx-router";
 
-declare module "htmx-router" {
+declare module "@mewhhaha/htmx-router" {
   interface Env {
     DB: D1Database;
   }

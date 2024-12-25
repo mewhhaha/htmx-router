@@ -35,7 +35,13 @@ export default function Root({ children }: { children?: string }) {
         })}
       </head>
       <body
-        class="bg-black text-white [&_*]:focus:outline-none [&_*]:focus-visible:outline-4 [&_*]:focus-visible:outline-offset-0 [&_*]:focus-visible:outline-blue-500"
+        class={`
+        bg-black text-white
+
+        [&_*]:focus:outline-none
+
+        [&_*]:focus-visible:outline-4 [&_*]:focus-visible:outline-offset-0 [&_*]:focus-visible:outline-blue-500
+        `}
         hx-boost="true"
         hx-ext="morph"
       >

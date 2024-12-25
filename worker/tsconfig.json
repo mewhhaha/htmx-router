@@ -13,10 +13,11 @@
     /* Specify what module code is generated. */
     "module": "es2022",
     "esModuleInterop": true,
+    "verbatimModuleSyntax": true,
     /* Specify how TypeScript looks up a file from a given module specifier. */
     "moduleResolution": "Bundler",
 
-    "jsxImportSource": "htmx-router",
+    "jsxImportSource": "@mewhhaha/htmx-router",
     /* Specify type package names to be included without being referenced in a source file. */
     "types": ["@cloudflare/workers-types/2023-07-01"],
     /* Enable importing .json files */
@@ -48,7 +49,7 @@
   "include": [
     "app",
     "src",
-    "create-import-map.ts",
+    "../fingerprint/main.ts",
     "tailwind.config.ts",
     ".router/types/**/*",
     "public/idiomorph-htmx.js",

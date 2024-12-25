@@ -1,0 +1,25 @@
+{
+  "name": "@mewhhaha/fingerprint",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "fingerprint": "./main.mts"
+  },
+  "description": "",
+  "scripts": {},
+  "exports": {
+    ".": {
+      "import": "./main.mts",
+      "types": "./main.mts"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.5.2",
+    "vitest": "^2.1.4"
+  }
+}

@@ -1,8 +1,8 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --experimental-strip-types --no-warnings
 
-import { generateRouter } from "./generate-router.mjs";
+import { generateRouter } from "./generate-router.mts";
 import path from "node:path";
-import { generateTypes } from "./generate-types.mjs";
+import { generateTypes } from "./generate-types.mts";
 
 const appFolder = path.normalize(process.argv[2]);
 

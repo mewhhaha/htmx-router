@@ -1,6 +1,6 @@
 
 import * as root from "./root.tsx";
-import { route } from "htmx-router";
+import { type route } from "@mewhhaha/htmx-router";
 import * as $_header_about from "./routes/_header.about.tsx";
 import * as $_header_blog from "./routes/_header.blog.tsx";
 import * as $_header_store_products__id from "./routes/_header.store.products.$id.tsx";

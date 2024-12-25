@@ -1,3 +1,5 @@
+#!/usr/bin/env node --experimental-strip-types --no-warnings
+
 import {
   readdir,
   copyFile,
@@ -12,9 +14,24 @@ import process from "node:process";
 
 const dev = process.argv.includes("--dev");
 
-const folders = ["./public"];
-const jsonOutput = "./app/import-map.json";
-const folderOutput = "./dist/assets";
+const args: Record<string, string[]> = {};
+for (let i = 0; i < process.argv.length; i++) {
+  const arg = process.argv[i];
+  if (arg.startsWith("-")) {
+    const key = arg.slice(1);
+    const previous = args[key];
+    if (previous) {
+      previous.push(process.argv[i + 1]);
+    } else {
+      args[key] = [process.argv[i + 1]];
+    }
+    i++;
+  }
+}
+
+const input = args.i || args.input || ["./public"];
+const output = args.o?.[0] || args.output?.[0] || "./dist/assets";
+const map = args.m?.[0] || args["import-map"]?.[0];
 
 const generateFingerprints = async (folder: string) => {
   const files = await readdir(folder);
@@ -45,10 +62,7 @@ const copyFolder = async (
   const files = await readdir(folder);
 
   for (const file of files) {
-    await copyFile(
-      `${folder}/${file}`,
-      `./${folderOutput}/${fingerprints[file]}`,
-    );
+    await copyFile(`${folder}/${file}`, `./${output}/${fingerprints[file]}`);
   }
 };
 
@@ -69,15 +83,17 @@ const readImportMap = (fingerprints: Record<string, string>) => {
   return importMap;
 };
 
-await removeFolder(folderOutput);
-await mkdir(folderOutput, { recursive: true });
+await removeFolder(output);
+await mkdir(output, { recursive: true });
 
-const fingerprints = await Promise.all(folders.map(generateFingerprints)).then(
+const fingerprints = await Promise.all(input.map(generateFingerprints)).then(
   (f) => Object.assign({}, ...f),
 );
 
-await Promise.all(folders.map((folder) => copyFolder(folder, fingerprints)));
+await Promise.all(input.map((folder) => copyFolder(folder, fingerprints)));
 
-const importMap = JSON.stringify(readImportMap(fingerprints), null, 2);
+if (map) {
+  const importMap = JSON.stringify(readImportMap(fingerprints), null, 2);
 
-await writeFile(jsonOutput, importMap);
+  await writeFile(map, importMap);
+}

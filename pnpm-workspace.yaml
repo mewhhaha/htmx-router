@@ -1,5 +1,3 @@
 packages:
   - worker
-  - components
-  - htmx-router-runtime
-  - htmx-router
+  - deps/*

@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["ESNext"],
-    "allowImportingTsExtensions": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "DOM.AsyncIterable"],
     "module": "NodeNext",
+    "esModuleInterop": true,
     "moduleResolution": "NodeNext",
-    "jsxImportSource": "typed-htmx/typed-html",
     "types": ["@cloudflare/workers-types/2023-07-01"],
     "resolveJsonModule": true,
     "allowJs": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "htmx-router-runtime/server",
+    "allowImportingTsExtensions": true,
     "checkJs": false,
     "noEmit": true,
     "isolatedModules": true,
@@ -17,5 +19,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["create-import-map.ts"]
+  "include": ["src"]
 }

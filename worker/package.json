@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "deploy": "pnpm build && wrangler deploy",
-    "dev": "pnpm dev:assets &&wrangler dev --assets ./public --live-reload",
+    "dev": "pnpm dev:assets && wrangler dev --assets ./public --live-reload",
     "start": "wrangler dev",
     "test": "vitest",
     "cf-typegen": "wrangler types",
@@ -13,26 +13,27 @@
     "build": "run-s build:*",
     "build:routes": "pnpm routes",
     "build:styles": "tailwindcss -i ./tailwind.css -o ./public/styles.css",
-    "build:assets": "node --experimental-strip-types --no-warnings ./create-import-map.ts",
+    "build:assets": "fingerprint -i ./public -o ./dist/assets -m ./app/import-map.json",
     "dev:styles": "tailwindcss -i ./tailwind.css -o ./public/styles.css --watch",
-    "dev:assets": "node --experimental-strip-types --no-warnings ./create-import-map.ts --dev"
+    "dev:assets": "fingerprint -i ./public -o ./dist/assets -m ./app/import-map.json --dev"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241106.0",
-    "@tailwindcss/cli": "4.0.0-alpha.31",
-    "@types/node": "^22.9.0",
-    "esbuild": "^0.24.0",
+    "@cloudflare/workers-types": "^4.20241224.0",
+    "@mewhhaha/eslint-plugin-simple-tailwind": "^0.0.11",
+    "@mewhhaha/fingerprint": "workspace:^",
+    "@mewhhaha/htmx-router": "workspace:*",
+    "@tailwindcss/cli": "4.0.0-beta.8",
+    "@types/node": "^22.10.2",
+    "esbuild": "^0.24.2",
+    "eslint": "^9.17.0",
+    "eslint-plugin-oxlint": "^0.15.2",
     "npm-run-all": "^4.1.5",
-    "oxlint": "^0.11.0",
-    "prettier": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.6.8",
-    "tailwindcss": "4.0.0-alpha.31",
-    "typescript": "^5.5.2",
-    "vitest": "^2.1.4",
-    "wrangler": "^3.85.0"
-  },
-  "packageManager": "pnpm@9.12.1+sha512.e5a7e52a4183a02d5931057f7a0dbff9d5e9ce3161e33fa68ae392125b79282a8a8a470a51dfc8a0ed86221442eb2fb57019b0990ed24fab519bf0e1bc5ccfc4",
-  "dependencies": {
-    "htmx-router": "workspace:*"
+    "oxlint": "^0.15.3",
+    "prettier": "^3.4.2",
+    "tailwindcss": "4.0.0-beta.8",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.2",
+    "vitest": "^2.1.8",
+    "wrangler": "^3.99.0"
   }
 }

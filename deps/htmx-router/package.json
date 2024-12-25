@@ -1,16 +1,13 @@
 {
-  "name": "htmx-router",
+  "name": "@mewhhaha/htmx-router",
   "version": "1.0.0",
   "type": "module",
   "description": "",
   "bin": {
-    "fs-routes": "./dist/router.js"
+    "fs-routes": "./src/fs-routes/routes.mts"
   },
   "main": "./src/router.ts",
   "types": "./src/router.ts",
-  "scripts": {
-    "build": "esbuild src/fs-routes/routes.mts --outfile=dist/router.js --bundle --platform=node --format=esm"
-  },
   "exports": {
     ".": {
       "import": "./src/router.mts",
@@ -27,12 +24,11 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241106.0",
     "@types/node": "^22.9.0",
-    "esbuild": "^0.24.0",
-    "htmx-router-runtime": "workspace:^",
+    "typescript": "^5.5.2",
     "vitest": "^2.1.4"
   }
 }
